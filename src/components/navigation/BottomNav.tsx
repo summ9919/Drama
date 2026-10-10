@@ -105,18 +105,7 @@ export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps)
                     />
                     {/* 全透明高透镜片底色 */}
                     <View style={[StyleSheet.absoluteFill, styles.lensGlassBg]} />
-                    {/* 凸透镜弧光微反光 */}
-                    <LinearGradient
-                      colors={[
-                        'rgba(255, 255, 255, 0.88)',
-                        'rgba(255, 255, 255, 0.15)',
-                        'rgba(255, 255, 255, 0.0)',
-                      ]}
-                      start={{ x: 0.25, y: 0 }}
-                      end={{ x: 0.75, y: 1 }}
-                      style={[StyleSheet.absoluteFill, styles.lensSheen]}
-                    />
-                    {/* 水晶高光透镜外框 */}
+                    {/* 保留均匀玻璃质感，移除左上角聚集的白色反光 */}
                     <View style={[StyleSheet.absoluteFill, styles.lensBorder]} />
                   </View>
                 )}
@@ -208,10 +197,6 @@ const styles = StyleSheet.create({
   lensGlassBg: {
     borderRadius: 9999,
     backgroundColor: 'rgba(255, 255, 255, 0.22)', // 全透明玻璃，完全通透
-  },
-  lensSheen: {
-    borderRadius: 9999,
-    maxHeight: 22,
   },
   lensBorder: {
     borderRadius: 9999,

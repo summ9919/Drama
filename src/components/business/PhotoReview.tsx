@@ -60,12 +60,12 @@ export function PhotoReview({ uri, onRetake, onSave, saving }: Props) {
                 </LinearGradient>
               </View>
               <View>
-                <Text style={styles.scoreTitle}>构图很棒</Text>
-                <Text style={styles.meta}>快门 1/250 · ISO 100 · 自动白平衡</Text>
+                <Text style={styles.scoreTitle}>照片已拍摄</Text>
+                <Text style={styles.meta}>原图预览 · 相机自动参数</Text>
               </View>
             </View>
 
-            <Text style={styles.note}>人物和光线的距离刚刚好，保留了发丝的层次与通透感。</Text>
+            <Text style={styles.note}>查看画面细节，满意后保存到相册，也可以重拍一次。</Text>
 
             <View style={styles.actions}>
               {/* 重拍：雾态玻璃按钮 */}

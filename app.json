@@ -7,7 +7,9 @@
     "userInterfaceStyle": "light",
     "scheme": "warm-lens",
     "icon": "./assets/icon.png",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.warmlens.app",
@@ -23,15 +25,39 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F4F7F9"
       },
-      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router",
-      ["expo-camera", { "cameraPermission": "允许Drama相机使用相机，实时给你温柔的构图提示。" }],
-      ["expo-media-library", { "photosPermission": "允许Drama相机读取你的相册。", "savePhotosPermission": "允许Drama相机保存照片到相册。" }]
-    ]
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "允许Drama相机使用相机，实时给你温柔的构图提示。"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "允许Drama相机读取你的相册。",
+          "savePhotosPermission": "允许Drama相机保存照片到相册。"
+        }
+      ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "df091c58-a474-4d21-bd84-97b173eb39b4"
+      }
+    },
+    "owner": "tommycui"
   }
 }

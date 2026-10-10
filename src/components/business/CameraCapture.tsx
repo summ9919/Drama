@@ -1,268 +1,135 @@
 import React, { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CameraView } from 'expo-camera';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, shadows } from '../../constants/theme';
-import { appConfig } from '../../constants/config';
-import { IconButton } from '../ui/IconButton';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { colors } from '../../constants/theme';
+import { CAMERA_STYLES } from '../../constants/guidance';
+import type { CameraStyle } from '../../types/guidance';
+import { useCameraGuidance } from '../../hooks/useCameraGuidance';
+import { CameraGuidanceControls } from './CameraGuidanceControls';
+import { CameraDirectionOverlay } from './CameraDirectionOverlay';
+import { CameraReadyFrame, CameraReadyNotice, CameraShutterHalo } from './CameraReadyEffects';
+import { digitalZoomFactor, getCameraViewport } from '../../lib/cameraGeometry';
+import { getCompositionMessage } from '../../lib/compositionMessage';
 
 type Props = {
   cameraRef: React.RefObject<CameraView>;
   onClose: () => void;
-  onCapture: () => void;
+  onCapture: (uri: string) => void;
+  onConfigure: () => void;
 };
 
-export function CameraCapture({ cameraRef, onClose, onCapture }: Props) {
-  const [selectedZoom, setSelectedZoom] = useState<'0.5x' | '1x' | '2x'>('1x');
-  const [zoom, setZoom] = useState(0.04);
-  const [filter, setFilter] = useState('清透');
-  const [facing, setFacing] = useState<'back' | 'front'>('back');
-  const filters = ['清透', '奶杏', '薄荷', '胶片'];
-  const zoomValues: Record<'0.5x' | '1x' | '2x', number> = {
-    '0.5x': 0,
-    '1x': 0.04,
-    '2x': 0.15,
-  };
-
+export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure }: Props) {
+  const guide = useCameraGuidance(cameraRef, onCapture);
+  const [frame, setFrame] = useState({ width: 0, height: 0 });
+  const [headerHeight, setHeaderHeight] = useState(82);
+  const [controlsHeight, setControlsHeight] = useState(270);
+  const insets = useSafeAreaInsets();
+  const { context } = guide;
+  const viewport = getCameraViewport(frame.width, frame.height, insets.top + headerHeight, insets.bottom + controlsHeight);
+  const blocked = !guide.active || !guide.ready || guide.capturing || guide.sampling;
+  const canShoot = guide.enabled && guide.executionPhase === 'ready';
+  const message = guide.switching ? '正在切换镜头…' : getCompositionMessage(guide.enabled, guide.target, guide.result, guide.adjustingZoom, guide.autoZoom, guide.status, guide.executionPhase);
   return (
-    <View style={styles.screen}>
-      <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} zoom={zoom} />
-      <LinearGradient
-        colors={['rgba(20,30,38,0.7)', 'transparent', 'rgba(20,30,38,0.85)']}
-        locations={[0, 0.45, 1]}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
-
+    <View collapsable={false} style={styles.screen} onLayout={event => setFrame(event.nativeEvent.layout)}>
+      <StatusBar style="light" backgroundColor={colors.dark} translucent />
+      {guide.active && viewport.width > 0 && <View testID="camera-viewport" collapsable={false} style={[styles.cameraFrame, viewport]}>
+        <View collapsable={false} style={[StyleSheet.absoluteFill, { transform: [{ scale: digitalZoomFactor(context.zoom) }] }]}>
+        {/* Expo mirrors the front preview even when captured photos use mirror=false. */}
+        {/* Keep one native view: Android releases the shared camera provider asynchronously on unmount. */}
+        <CameraView ref={cameraRef} style={[StyleSheet.absoluteFill, { transform: [{ scaleX: context.facing === 'front' ? -1 : 1 }] }]}
+          facing={context.facing} zoom={0} mirror={false} ratio="4:3" flash={context.flash} autofocus="off" animateShutter={false}
+          onCameraReady={guide.cameraReady} onMountError={guide.cameraError} />
+        </View>
+        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+          <View style={[styles.gridVertical, { left: '33.33%' }]} /><View style={[styles.gridVertical, { left: '66.66%' }]} />
+          <View style={[styles.gridHorizontal, { top: '33.33%' }]} /><View style={[styles.gridHorizontal, { top: '66.66%' }]} />
+          <CameraDirectionOverlay target={guide.target} enabled={guide.enabled && guide.ready}
+            width={viewport.width} height={viewport.height} />
+          <CameraReadyFrame active={canShoot} width={viewport.width} height={viewport.height} />
+        </View>
+      </View>}
+      {/* Opaque sibling masks also cover SurfaceView overflow on Android. */}
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        <View style={[styles.previewMask, { top: 0, left: 0, right: 0, height: viewport.top }]} />
+        <View style={[styles.previewMask, { top: viewport.top + viewport.height, left: 0, right: 0, bottom: 0 }]} />
+        <View style={[styles.previewMask, { top: viewport.top, height: viewport.height, left: 0, width: viewport.left }]} />
+        <View style={[styles.previewMask, { top: viewport.top, height: viewport.height, right: 0, width: viewport.left }]} />
+      </View>
       <SafeAreaView style={styles.overlay} edges={['top', 'bottom']}>
-        {/* ── 顶部栏 ── */}
+        <View testID="camera-header" onLayout={event => {
+          const h = Math.round(event.nativeEvent.layout.height);
+          if (Math.abs(h - headerHeight) > 1) {
+            setHeaderHeight(h);
+          }
+        }}>
         <View style={styles.topBar}>
-          <IconButton icon="chevron-down" dark onPress={onClose} />
-
-          {/* 模式选择 (Apple 雾态深色胶囊) */}
-          <View style={styles.modePillOuter}>
-            <BlurView
-              intensity={50}
-              tint="dark"
-              style={[
-                StyleSheet.absoluteFill,
-                styles.pillBlur,
-              ]}
-            />
-            <View style={[StyleSheet.absoluteFill, styles.darkPillBg]} />
-            <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.darkPillBorder]} />
-
-            <View style={styles.modeActive}>
-              <Text style={styles.modeActiveText}>人像</Text>
-            </View>
-            <Pressable onPress={() => Alert.alert('胶片模式', '即将推出')}>
-              <Text style={styles.modeText}>胶片</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="关闭相机" onPress={onClose} style={styles.iconButton}>
+            <Ionicons name="chevron-down" size={23} color="#FFFFFF" />
+          </Pressable>
+          <View style={styles.modes}>{(['人像', '风景', '夜景'] as const).map(mode => (
+            <Pressable accessibilityRole="button" accessibilityState={{ selected: context.mode === mode }}
+              key={mode} disabled={guide.capturing} onPress={() => guide.changeMode(mode)} style={[styles.mode, context.mode === mode && styles.modeActive]}>
+              <Text style={[styles.modeText, context.mode === mode && styles.modeTextActive]}>{mode}</Text>
             </Pressable>
-            <Pressable onPress={() => Alert.alert('夜景模式', '即将推出')}>
-              <Text style={styles.modeText}>夜景</Text>
-            </Pressable>
-          </View>
-
-          <IconButton
-            icon="settings-outline"
-            dark
-            onPress={() => Alert.alert('设置', '自动白平衡已开启')}
-          />
+          ))}</View>
+          <Pressable accessibilityRole="button" accessibilityLabel="AI 配置" onPress={onConfigure} style={styles.iconButton}>
+            <Ionicons name="options-outline" size={22} color="#FFFFFF" />
+          </Pressable>
         </View>
-
-        {/* ── 取景对焦指导 ── */}
-        <View style={styles.guideArea}>
-          <View style={styles.guideBracket} />
-          <View style={styles.guideRing}>
-            <View style={styles.guideDot} />
-          </View>
-
-          {/* 悬浮指导气泡 (Apple 雾态浮动卡) */}
-          <View style={styles.coachBubbleWrapper}>
-            <BlurView
-              intensity={60}
-              tint="light"
-              style={[
-                StyleSheet.absoluteFill,
-                styles.bubbleBlur,
-              ]}
-            />
-            <View style={[StyleSheet.absoluteFill, styles.coachGlassBg]} />
-            <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.coachBorder]} />
-
-            <View style={styles.coachContent}>
-              <Text style={styles.coachTitle}>{appConfig.suggestedMove}</Text>
-            </View>
-          </View>
-
-          {/* 底部小标签 */}
-          <View style={styles.guideCaption}>
-            <BlurView
-              intensity={45}
-              tint="dark"
-              style={[StyleSheet.absoluteFill, { borderRadius: 14 }]}
-            />
-            <View style={[StyleSheet.absoluteFill, styles.captionBg]} />
-            <Ionicons name="sunny-outline" size={14} color={colors.whiteWarm} />
-            <Text style={styles.guideCaptionText}>{appConfig.cameraGuide}</Text>
-          </View>
+          <Text style={styles.previewLabel}>{context.facing === 'front' ? '前置 · 非镜像预览' : '后置相机'} · {context.style}风格</Text>
         </View>
-
-        {/* ── 底部控制板 ── */}
-        <View style={styles.controls}>
-          {/* 参数提示 */}
-          <View style={styles.metaRow}>
-            <Text style={styles.meta}>快门 1/250</Text>
-            <Text style={styles.metaDot}>·</Text>
-            <Text style={styles.meta}>ISO 100</Text>
-            <Text style={styles.metaDot}>·</Text>
-            <Text style={styles.meta}>自动白平衡</Text>
-          </View>
-
-          {/* 变焦切换 (Apple 玻璃小药丸) */}
+        <View style={styles.viewfinderSpace} pointerEvents="none" />
+        <View testID="camera-controls" style={styles.controls}
+          onLayout={event => {
+            const h = Math.round(event.nativeEvent.layout.height);
+            if (Math.abs(h - controlsHeight) > 1) {
+              setControlsHeight(h);
+            }
+          }}>
+          <CameraReadyNotice active={canShoot} message={message} />
+          {guide.enabled && guide.executionPhase === 'manual' && <View style={styles.confirmSlot}><Pressable accessibilityRole="button" accessibilityLabel="手动确认已调整"
+            disabled={guide.capturing || !guide.ready} onPress={guide.confirmAdjustment} style={styles.confirmStep}>
+            <Text style={styles.confirmStepText}>已调整，确认到位</Text>
+          </Pressable></View>}
+          {guide.enabled && guide.result && <View testID="camera-advice" accessibilityElementsHidden={canShoot} importantForAccessibility={canShoot ? 'no-hide-descendants' : 'auto'} style={[styles.advice, canShoot && { opacity: 0 }]}>
+            {message !== guide.result.advice.summary && <Text style={styles.adviceText}>{guide.result.advice.summary}</Text>}
+            <Text style={styles.lightText}>光线：{guide.result.advice.light}</Text>
+          </View>}
+          <CameraGuidanceControls enabled={guide.enabled} starting={guide.starting} disabled={guide.capturing}
+            autoZoom={guide.autoZoom} status={guide.status} configMissing={guide.configMissing}
+            onToggle={() => void guide.toggleGuidance()} onAutoZoom={guide.toggleAutoZoom} onRefresh={guide.refresh} onConfigure={onConfigure} />
           <View style={styles.zoomRow}>
-            {(['0.5x', '1x', '2x'] as const).map((item) => {
-              const active = selectedZoom === item;
-              return (
-                <Pressable
-                  key={item}
-                  onPress={() => {
-                    setSelectedZoom(item);
-                    setZoom(zoomValues[item]);
-                  }}
-                  style={({ pressed }) => [
-                    styles.zoomChipOuter,
-                    { transform: [{ scale: pressed ? 0.92 : 1 }] },
-                  ]}
-                >
-                  <BlurView
-                    intensity={active ? 60 : 45}
-                    tint={active ? 'light' : 'dark'}
-                    style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}
-                  />
-                  <View
-                    style={[
-                      StyleSheet.absoluteFill,
-                      active ? styles.zoomActiveBg : styles.zoomInactiveBg,
-                    ]}
-                  />
-                  <View
-                    pointerEvents="none"
-                    style={[
-                      StyleSheet.absoluteFill,
-                      {
-                        borderRadius: 16,
-                        borderWidth: 1,
-                        borderColor: active ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.22)',
-                      },
-                    ]}
-                  />
-                  <Text style={[styles.zoomText, active && styles.zoomTextActive]}>
-                    {item}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            <Pressable accessibilityRole="button" accessibilityLabel="缩小画面" disabled={guide.capturing || context.zoom <= 0}
+              onPress={() => guide.manualZoom(context.zoom - 0.025)} style={styles.zoomButton}><Ionicons name="remove" size={20} color="#FFFFFF" /></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="恢复原始变焦" disabled={guide.capturing} onPress={() => guide.manualZoom(0)} style={styles.zoomLabel}>
+              <Text style={styles.zoomText}>{context.zoom < 0.001 ? '1.0× 原始视野' : `${digitalZoomFactor(context.zoom).toFixed(2)}× 数字变焦`}</Text>
+            </Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="放大画面" disabled={guide.capturing || context.zoom >= 1}
+              onPress={() => guide.manualZoom(context.zoom + 0.025)} style={styles.zoomButton}><Ionicons name="add" size={20} color="#FFFFFF" /></Pressable>
           </View>
-
-          {/* 核心快门栏 */}
           <View style={styles.captureRow}>
-            {/* 相册缩略图入口 (玻璃圆钮) */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.sideButton,
-                { transform: [{ scale: pressed ? 0.92 : 1 }] },
-              ]}
-              onPress={() => Alert.alert('预览', '拍摄后可以在这里查看最新照片。')}
-            >
-              <BlurView
-                intensity={50}
-                tint="dark"
-                style={[StyleSheet.absoluteFill, { borderRadius: 22 }]}
-              />
-              <View style={[StyleSheet.absoluteFill, styles.sideButtonBg]} />
-              <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.sideButtonBorder]} />
-              <Ionicons name="image-outline" size={20} color={colors.whiteWarm} />
-            </Pressable>
-
-            {/* Apple 雾态发光快门按钮 */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.shutterOuter,
-                { transform: [{ scale: pressed ? 0.93 : 1 }] },
-              ]}
-              onPress={onCapture}
-            >
-              <View style={styles.shutterHalo} />
-              <View style={styles.shutterRing}>
-                <View style={styles.shutterCenter} />
-              </View>
-            </Pressable>
-
-            {/* 翻转镜头按钮 (玻璃圆钮) */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.sideButton,
-                { transform: [{ scale: pressed ? 0.92 : 1 }] },
-              ]}
-              onPress={() => setFacing((current) => (current === 'back' ? 'front' : 'back'))}
-            >
-              <BlurView
-                intensity={50}
-                tint="dark"
-                style={[StyleSheet.absoluteFill, { borderRadius: 22 }]}
-              />
-              <View style={[StyleSheet.absoluteFill, styles.sideButtonBg]} />
-              <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.sideButtonBorder]} />
-              <Ionicons name="camera-reverse-outline" size={22} color={colors.whiteWarm} />
+            <View style={styles.sideLabel}><Text style={styles.meta}>系统自动曝光</Text><Text style={styles.meta}>闪光灯 · {context.flash === 'on' ? '开' : context.flash === 'auto' ? '自动' : '关'}</Text></View>
+            <View style={styles.shutterArea}><CameraShutterHalo active={canShoot} />
+            <Pressable accessibilityRole="button" accessibilityLabel="拍照" disabled={!guide.ready || guide.capturing || !guide.active || guide.executionPhase === 'parameters'}
+              onPress={() => void guide.capture()} style={({ pressed }) => [styles.shutter, canShoot && styles.readyShutter, (!guide.ready || guide.capturing) && styles.disabled, pressed && styles.pressed]}>
+              <View style={[styles.shutterInner, canShoot && styles.readyShutterInner]}>{guide.capturing ? <ActivityIndicator color={colors.primary} /> : canShoot && <Ionicons name="camera" size={25} color="#174A35" />}</View>
+            </Pressable></View>
+            <Pressable accessibilityRole="button" accessibilityLabel="切换前后镜头" disabled={blocked}
+              accessibilityState={{ disabled: blocked, busy: guide.switching }}
+              onPress={guide.flipCamera} style={[styles.flip, blocked && styles.disabled]}>
+              {guide.switching ? <ActivityIndicator color="#FFFFFF" /> : <Ionicons name="camera-reverse-outline" size={25} color="#FFFFFF" />}
             </Pressable>
           </View>
-
-          {/* 滤镜胶囊栏 (Apple 雾态选择药丸) */}
-          <View style={styles.filterRow}>
-            {filters.map((item) => {
-              const active = filter === item;
-              return (
-                <Pressable
-                  key={item}
-                  onPress={() => setFilter(item)}
-                  style={({ pressed }) => [
-                    styles.filterChip,
-                    { transform: [{ scale: pressed ? 0.94 : 1 }] },
-                  ]}
-                >
-                  <BlurView
-                    intensity={active ? 55 : 35}
-                    tint={active ? 'light' : 'dark'}
-                    style={[StyleSheet.absoluteFill, { borderRadius: 15 }]}
-                  />
-                  <View
-                    style={[
-                      StyleSheet.absoluteFill,
-                      active ? styles.filterActiveBg : styles.filterInactiveBg,
-                    ]}
-                  />
-                  <View
-                    pointerEvents="none"
-                    style={[
-                      StyleSheet.absoluteFill,
-                      {
-                        borderRadius: 15,
-                        borderWidth: 1,
-                        borderColor: active ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.18)',
-                      },
-                    ]}
-                  />
-                  <Text style={[styles.filterText, active && styles.filterTextActive]}>
-                    {item}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          <Text style={styles.tuningText}>{guide.tuningMessage}</Text>
+          <View style={styles.filters}>{(Object.keys(CAMERA_STYLES) as CameraStyle[]).map(style => (
+            <Pressable accessibilityRole="button" accessibilityState={{ selected: context.style === style }} key={style} disabled={guide.capturing}
+              onPress={() => guide.changeStyle(style)} style={[styles.filter, context.style === style && styles.filterActive]}>
+              <Text style={styles.filterText}>{style}</Text>
+            </Pressable>
+          ))}</View>
         </View>
       </SafeAreaView>
     </View>
@@ -270,296 +137,48 @@ export function CameraCapture({ cameraRef, onClose, onCapture }: Props) {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.dark,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-
-  /* 顶部栏 */
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingTop: 6,
-  },
-  modePillOuter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 22,
-    padding: 3,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  pillBlur: {
-    borderRadius: 22,
-  },
-  darkPillBg: {
-    borderRadius: 22,
-    backgroundColor: 'rgba(20, 30, 38, 0.52)',
-  },
-  darkPillBorder: {
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
-  },
-  modeActive: {
-    backgroundColor: 'rgba(243, 223, 181, 0.95)',
-    paddingVertical: 6,
-    paddingHorizontal: 13,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    ...shadows.glassSm,
-  },
-  modeActiveText: {
-    color: colors.ink,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  modeText: {
-    color: 'rgba(254, 253, 251, 0.85)',
-    fontSize: 12,
-    paddingHorizontal: 11,
-    fontWeight: '500',
-  },
-
-  /* 取景指导 */
-  guideArea: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  guideBracket: {
-    width: 260,
-    height: 340,
-    borderWidth: 1,
-    borderColor: 'rgba(254, 253, 251, 0.35)',
-    borderRadius: 6,
-  },
-  guideRing: {
-    position: 'absolute',
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    borderWidth: 1.5,
-    borderColor: colors.mistBlue,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  guideDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.whiteWarm,
-  },
-  coachBubbleWrapper: {
-    position: 'absolute',
-    top: '30%',
-    right: 22,
-    borderRadius: 20,
-    overflow: 'hidden',
-    ...shadows.glassMd,
-  },
-  bubbleBlur: {
-    borderRadius: 20,
-  },
-  coachGlassBg: {
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.82)',
-  },
-  coachBorder: {
-    borderRadius: 20,
-    borderWidth: 1.1,
-    borderColor: 'rgba(255, 255, 255, 0.95)',
-  },
-  coachContent: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  coachTitle: {
-    color: colors.ink,
-    fontSize: 12.5,
-    fontWeight: '700',
-  },
-  guideCaption: {
-    position: 'absolute',
-    bottom: '16%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
-  },
-  captionBg: {
-    backgroundColor: 'rgba(20, 30, 38, 0.52)',
-  },
-  guideCaptionText: {
-    color: colors.whiteWarm,
-    fontSize: 12,
-  },
-
-  /* 底部面板 */
-  controls: {
-    paddingHorizontal: 20,
-    paddingBottom: 14,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 14,
-  },
-  meta: {
-    color: 'rgba(254, 253, 251, 0.85)',
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  metaDot: {
-    color: 'rgba(254, 253, 251, 0.45)',
-    fontSize: 11,
-  },
-
-  /* 变焦条 */
-  zoomRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 10,
-    marginBottom: 18,
-  },
-  zoomChipOuter: {
-    width: 48,
-    height: 32,
-    borderRadius: 16,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  zoomActiveBg: {
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-  },
-  zoomInactiveBg: {
-    borderRadius: 16,
-    backgroundColor: 'rgba(20, 30, 38, 0.55)',
-  },
-  zoomText: {
-    color: colors.whiteWarm,
-    fontSize: 12,
-    fontWeight: '600',
-    zIndex: 2,
-  },
-  zoomTextActive: {
-    color: colors.ink,
-    fontWeight: '700',
-  },
-
-  /* 快门行 */
-  captureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 26,
-  },
-  sideButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.glassDark,
-  },
-  sideButtonBg: {
-    borderRadius: 23,
-    backgroundColor: 'rgba(20, 30, 38, 0.55)',
-  },
-  sideButtonBorder: {
-    borderRadius: 23,
-    borderWidth: 1.1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-
-  /* Apple 快门 */
-  shutterOuter: {
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    ...shadows.glassDark,
-  },
-  shutterHalo: {
-    position: 'absolute',
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    borderWidth: 3.5,
-    borderColor: 'rgba(255, 255, 255, 0.95)',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  shutterRing: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.whiteWarm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(184, 201, 214, 0.45)',
-  },
-  shutterCenter: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: colors.whiteWarm,
-  },
-
-  /* 滤镜行 */
-  filterRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 18,
-  },
-  filterChip: {
-    borderRadius: 15,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterActiveBg: {
-    borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
-  },
-  filterInactiveBg: {
-    borderRadius: 15,
-    backgroundColor: 'rgba(20, 30, 38, 0.45)',
-  },
-  filterText: {
-    color: 'rgba(254, 253, 251, 0.65)',
-    fontSize: 11.5,
-    fontWeight: '500',
-    zIndex: 2,
-  },
-  filterTextActive: {
-    color: colors.whiteWarm,
-    fontWeight: '700',
-  },
+  screen: { flex: 1, overflow: 'hidden', backgroundColor: colors.dark, alignItems: 'center', justifyContent: 'center' },
+  cameraFrame: { position: 'absolute', overflow: 'hidden' },
+  previewMask: { position: 'absolute', backgroundColor: colors.dark },
+  overlay: { flex: 1, width: '100%', maxWidth: 720 },
+  gridVertical: { position: 'absolute', top: 0, bottom: 0, width: StyleSheet.hairlineWidth, backgroundColor: '#FFFFFF50' },
+  gridHorizontal: { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: '#FFFFFF50' },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingTop: 6, gap: 8 },
+  iconButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1D2A3499', alignItems: 'center', justifyContent: 'center' },
+  modes: { flexDirection: 'row', borderRadius: 20, padding: 3, backgroundColor: '#1D2A34BB' },
+  mode: { paddingHorizontal: 13, paddingVertical: 8, borderRadius: 17 },
+  modeActive: { backgroundColor: '#F3DFB5' },
+  modeText: { color: '#FFFFFF', fontSize: 12 },
+  modeTextActive: { color: colors.ink, fontWeight: '700' },
+  viewfinderSpace: { flex: 1 },
+  previewLabel: { alignSelf: 'center', marginTop: 4, marginBottom: 6, fontSize: 10, color: '#FFFFFFCC', paddingHorizontal: 8, paddingVertical: 2 },
+  controls: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 6 },
+  guidanceMessage: { textAlign: 'center', color: '#BCD3CB', fontSize: 13, lineHeight: 18, minHeight: 28, marginBottom: 4 },
+  readyMessage: { color: '#7FF0BE', fontSize: 18, fontWeight: '700' },
+  readyShutter: { borderColor: '#7FF0BE' },
+  readyShutterInner: { backgroundColor: '#A5FFD7' },
+  shutterArea: { width: 78, height: 78, alignItems: 'center', justifyContent: 'center' },
+  tuningText: { color: '#AFC3BB', fontSize: 10, lineHeight: 14, textAlign: 'center', marginTop: 3 },
+  confirmStep: { alignSelf: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 16, backgroundColor: '#28453D' },
+  confirmSlot: { justifyContent: 'center', marginVertical: 4 },
+  confirmStepText: { color: '#BCF5E4', fontSize: 12, fontWeight: '600' },
+  advice: { alignItems: 'center', marginBottom: 4, gap: 2 },
+  adviceText: { color: '#E5EEE9', fontSize: 12, lineHeight: 16, textAlign: 'center' },
+  lightText: { color: '#AFC3BB', fontSize: 11, lineHeight: 15, textAlign: 'center' },
+  zoomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 6 },
+  zoomButton: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#273A48CC', alignItems: 'center', justifyContent: 'center' },
+  zoomLabel: { minWidth: 100, paddingVertical: 4, paddingHorizontal: 8, alignItems: 'center' },
+  zoomText: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
+  captureRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  sideLabel: { width: 88, gap: 3 },
+  meta: { fontSize: 10, color: '#C6D3DC' },
+  shutter: { width: 68, height: 68, borderRadius: 34, borderWidth: 3, borderColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  shutterInner: { width: 54, height: 54, borderRadius: 27, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  flip: { width: 88, height: 46, alignItems: 'center', justifyContent: 'center' },
+  pressed: { transform: [{ scale: 0.94 }] },
+  disabled: { opacity: 0.4 },
+  filters: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 6 },
+  filter: { paddingHorizontal: 13, paddingVertical: 5, borderRadius: 12, backgroundColor: '#273A4899' },
+  filterActive: { backgroundColor: '#587991' },
+  filterText: { fontSize: 12, color: '#FFFFFF' },
 });

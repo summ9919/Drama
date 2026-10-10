@@ -15,12 +15,14 @@ export function RainbowBrand() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 42,
+    height: 54,
     justifyContent: 'center',
+    alignItems: 'flex-start',
     alignSelf: 'flex-start',
   },
   logoImage: {
-    height: 40,
-    width: 136,
+    height: 52,
+    width: 165,
+    alignSelf: 'flex-start',
   },
 });

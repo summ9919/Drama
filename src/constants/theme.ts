@@ -1,8 +1,8 @@
 import { Platform } from 'react-native';
 
 export const colors = {
-  // ── 背景（04 MIST BLUE BUTTER 高对比雾态玻璃衬底层） ──
-  canvas: '#D8E5EE',         // 饱满浅雾蓝底（高对比度，极大凸显毛玻璃白光与折射）
+  // 页面背景
+  canvas: '#FFFFFF',
   canvasWarm: '#EFE6D6',     // 暖黄油中调底
   paper: '#FCFDFE',          // 卡片白
 

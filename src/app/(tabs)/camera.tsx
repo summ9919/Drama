@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Alert, Modal } from 'react-native';
 import { CameraView } from 'expo-camera';
 import { useRouter } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CameraCapture } from '../../components/business/CameraCapture';
 import { CameraHome } from '../../components/business/CameraHome';
 import { PhotoReview } from '../../components/business/PhotoReview';
@@ -20,12 +21,9 @@ export default function CameraRoute() {
   const clearCapturedUri = useCaptureStore((state) => state.clearCapturedUri);
   const [saving, setSaving] = React.useState(false);
 
-  const takePhoto = async () => {
-    const picture = await cameraRef.current?.takePictureAsync({ quality: 0.9, skipProcessing: true });
-    if (picture?.uri) {
-      setCapturedUri(picture.uri);
-      camera.close();
-    }
+  const takePhoto = (uri: string) => {
+    setCapturedUri(uri);
+    camera.close();
   };
 
   const retake = async () => {
@@ -53,6 +51,9 @@ export default function CameraRoute() {
 
   return <Screen>
     {capturedUri ? <PhotoReview uri={capturedUri} onRetake={retake} onSave={save} saving={saving} /> : <CameraHome permissionGranted={camera.permissionGranted} onOpenCamera={camera.open} />}
-    <Modal visible={camera.visible} animationType="slide" onRequestClose={camera.close}><CameraCapture cameraRef={cameraRef} onClose={camera.close} onCapture={takePhoto} /></Modal>
+    <Modal visible={camera.visible} animationType="slide" statusBarTranslucent presentationStyle="fullScreen" onRequestClose={camera.close}>
+      {camera.visible && <SafeAreaProvider><CameraCapture cameraRef={cameraRef} onClose={camera.close} onCapture={takePhoto}
+        onConfigure={() => { camera.close(); router.push('/settings/ai'); }} /></SafeAreaProvider>}
+    </Modal>
   </Screen>;
 }

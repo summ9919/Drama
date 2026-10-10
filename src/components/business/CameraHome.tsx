@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { colors, fonts, shadows } from '../../constants/theme';
 import { editorialShots } from '../../constants/data';
 import { IconButton } from '../ui/IconButton';
 import { PrimaryButton } from '../ui/PrimaryButton';
 import { RainbowBrand } from '../ui/RainbowBrand';
+import { CardSurface } from '../ui/CardSurface';
 
 type Props = {
   permissionGranted: boolean;
@@ -53,43 +53,13 @@ export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
       </Animated.View>
 
       {/* ── Apple 雾态玻璃权限卡片 ── */}
-      <View style={styles.permissionCardWrapper}>
-        <View style={styles.permissionCard}>
-          {/* 雾态玻璃模糊基底层 */}
-          <BlurView
-            intensity={45}
-            tint="light"
-            style={[
-              StyleSheet.absoluteFill,
-              styles.blurLayer,
-            ]}
-          />
-
-          {/* 半透微光底色 */}
-          <View style={[StyleSheet.absoluteFill, styles.cardGlassBg]} />
-
-          {/* 顶端柔和反光高光 */}
-          <LinearGradient
-            colors={['rgba(255, 255, 255, 0.6)', 'rgba(255, 255, 255, 0.0)']}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 0.5 }}
-            style={[StyleSheet.absoluteFill, styles.sheen]}
-            pointerEvents="none"
-          />
-
-          {/* 04 MIST BLUE BUTTER 装饰弥散光晕 */}
-          <View style={styles.glowOuter} pointerEvents="none">
-            <LinearGradient
-              colors={['#B8C9D6', '#7E9BB2', '#F3DFB5']}
-              style={styles.glowGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            />
-          </View>
-
-          {/* 精致边缘高光描边 */}
-          <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.glassBorder]} />
-
+      <CardSurface
+        radius={28}
+        borderWidth={1.2}
+        borderColor="rgba(255, 255, 255, 0.58)"
+        style={styles.permissionCardWrapper}
+        contentStyle={styles.permissionCard}
+      >
           {/* 内容 */}
           <View style={styles.cardContent}>
             <View style={styles.permissionIconWrapper}>
@@ -122,8 +92,7 @@ export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
 
             <Text style={styles.later}>稍后设置也可以</Text>
           </View>
-        </View>
-      </View>
+      </CardSurface>
 
       {/* ── 三大特性 (Apple 雾态玻璃小方块) ── */}
       <View style={styles.featureRow}>
@@ -208,26 +177,19 @@ function FeatureCard({
   accent: string;
 }) {
   return (
-    <View style={styles.featureItemWrapper}>
-      <View style={styles.featureItem}>
-        <BlurView
-          intensity={32}
-          tint="light"
-          style={[
-            StyleSheet.absoluteFill,
-            styles.blurLayer,
-          ]}
-        />
-        <View style={[StyleSheet.absoluteFill, styles.featureGlassBg]} />
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.glassBorderSmall]} />
-
+    <CardSurface
+      radius={20}
+      borderWidth={1.1}
+      borderColor="rgba(255, 255, 255, 0.56)"
+      style={styles.featureItemWrapper}
+      contentStyle={styles.featureItem}
+    >
         <View style={[styles.featureIconBg, { backgroundColor: accent }]}>
           <Ionicons name={icon} size={20} color={colors.ink} />
         </View>
         <Text style={styles.featureTitle}>{title}</Text>
         <Text style={styles.featureBody}>{body}</Text>
-      </View>
-    </View>
+    </CardSurface>
   );
 }
 
@@ -364,54 +326,18 @@ const styles = StyleSheet.create({
   /* 权限卡片 */
   permissionCardWrapper: {
     borderRadius: 28,
+    backgroundColor: 'transparent',
     ...shadows.glassMd,
   },
   permissionCard: {
-    borderRadius: 28,
-    position: 'relative',
-    overflow: 'hidden',
     alignItems: 'center',
     paddingTop: 28,
     paddingBottom: 24,
     paddingHorizontal: 22,
   },
-  blurLayer: {
-    borderRadius: 28,
-  },
-  cardGlassBg: {
-    backgroundColor: 'rgba(255, 255, 255, 0.48)',
-  },
-  featureGlassBg: {
-    backgroundColor: 'rgba(255, 255, 255, 0.38)',
-  },
-  sheen: {
-    maxHeight: 48,
-  },
-  glassBorder: {
-    borderRadius: 28,
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 255, 255, 0.88)',
-  },
-  glassBorderSmall: {
-    borderRadius: 20,
-    borderWidth: 1.1,
-    borderColor: 'rgba(255, 255, 255, 0.85)',
-  },
-  glowOuter: {
-    position: 'absolute',
-    top: -50,
-    width: 220,
-    height: 120,
-    borderRadius: 110,
-    overflow: 'hidden',
-    opacity: 0.38,
-  },
-  glowGradient: {
-    width: '100%',
-    height: '100%',
-  },
   cardContent: {
     width: '100%',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     zIndex: 2,
   },
@@ -485,12 +411,12 @@ const styles = StyleSheet.create({
   featureItemWrapper: {
     flex: 1,
     borderRadius: 20,
+    backgroundColor: 'transparent',
     ...shadows.glassSm,
   },
   featureItem: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    position: 'relative',
+    // Fill the stretched row height so the border follows the outer bottom edge.
+    flexGrow: 1,
     padding: 13,
     paddingTop: 15,
     minHeight: 122,

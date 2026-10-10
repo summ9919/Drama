@@ -7,63 +7,60 @@ import {
   Text,
   View,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, fonts, shadows } from '../../constants/theme';
 import { PageHeader } from '../ui/PageHeader';
+import { CardSurface } from '../ui/CardSurface';
+import { useRouter } from 'expo-router';
+
+const profileItems = [
+  { title: 'AI 配置', icon: 'options-outline' },
+  { title: '我的作品', icon: 'images-outline' },
+  { title: '收藏的灵感', icon: 'heart-outline' },
+  { title: '拍摄统计', icon: 'bar-chart-outline' },
+  { title: '意见反馈', icon: 'mail-outline' },
+  { title: '关于Drama相机', icon: 'information-circle-outline' },
+] as const;
 
 export function ProfilePage() {
+  const router = useRouter();
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <PageHeader title="我的" icon="settings-outline" />
 
-      {/* ── Apple 雾态个人信息卡片 ── */}
-      <View style={styles.profileCardWrapper}>
-        <View style={styles.profileCard}>
-          <BlurView
-            intensity={65}
-            tint="light"
-            style={[
-              StyleSheet.absoluteFill,
-              styles.cardBlur,
-            ]}
-          />
-          <View style={[StyleSheet.absoluteFill, styles.cardBg]} />
-          <LinearGradient
-            colors={['rgba(255, 255, 255, 0.65)', 'rgba(255, 255, 255, 0.0)']}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 0.5 }}
-            style={[StyleSheet.absoluteFill, styles.sheen]}
-            pointerEvents="none"
-          />
-          <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.cardBorder]} />
-
-          <View style={styles.profileContent}>
-            {/* 头像 */}
-            <View style={styles.avatarWrapper}>
-              <LinearGradient
-                colors={[colors.primary, colors.mistBlue]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.avatar}
-              >
-                <Text style={styles.avatarText}>D</Text>
-              </LinearGradient>
-              <View pointerEvents="none" style={styles.avatarBorder} />
-            </View>
-
-            <View style={styles.info}>
-              <Text style={styles.name}>摄影练习生</Text>
-              <Text style={styles.desc}>用镜头记录生活的温暖</Text>
-            </View>
-
-            <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+      {/* ── 个人信息卡片 (与首页卡片保持一致的 CardSurface) ── */}
+      <CardSurface
+        radius={26}
+        borderWidth={1.2}
+        borderColor="rgba(255, 255, 255, 0.58)"
+        style={styles.profileCardWrapper}
+        contentStyle={styles.profileCard}
+      >
+        <View style={styles.profileContent}>
+          {/* 头像 */}
+          <View style={styles.avatarWrapper}>
+            <LinearGradient
+              colors={[colors.primary, colors.mistBlue]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.avatar}
+            >
+              <Text style={styles.avatarText}>D</Text>
+            </LinearGradient>
+            <View pointerEvents="none" style={styles.avatarBorder} />
           </View>
-        </View>
-      </View>
 
-      {/* ── Apple 雾态功能方块 (04 MIST BLUE BUTTER 配色) ── */}
+          <View style={styles.info}>
+            <Text style={styles.name}>摄影练习生</Text>
+            <Text style={styles.desc}>用镜头记录生活的温暖</Text>
+          </View>
+
+          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+        </View>
+      </CardSurface>
+
+      {/* ── 功能方块 (与首页 FeatureCard 保持完全一致) ── */}
       <View style={styles.tiles}>
         <Tile
           icon="color-palette-outline"
@@ -85,65 +82,51 @@ export function ProfilePage() {
         />
       </View>
 
-      {/* ── Apple 雾态列表组 ── */}
-      <View style={styles.listCardWrapper}>
-        <View style={styles.listCard}>
-          <BlurView
-            intensity={60}
-            tint="light"
-            style={[
-              StyleSheet.absoluteFill,
-              styles.cardBlur,
-            ]}
-          />
-          <View style={[StyleSheet.absoluteFill, styles.cardBg]} />
-          <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.cardBorder]} />
-
-          <View style={styles.listContent}>
-            {['我的作品', '收藏的灵感', '拍摄统计', '意见反馈', '关于Drama相机'].map(
-              (item, index) => (
-                <Pressable
-                  key={item}
-                  style={({ pressed }) => [
-                    styles.listRow,
-                    index === 4 && styles.listRowLast,
-                    { opacity: pressed ? 0.7 : 1 },
-                  ]}
-                  onPress={() => Alert.alert(item, '这个入口会在下一版开放。')}
-                >
-                  <View style={styles.listLeft}>
-                    <View style={styles.listIconWrap}>
-                      <BlurView
-                        intensity={40}
-                        tint="light"
-                        style={[StyleSheet.absoluteFill, { borderRadius: 10 }]}
-                      />
-                      <View style={styles.iconInnerBg} />
-                      <Ionicons
-                        name={
-                          (
-                            [
-                              'images-outline',
-                              'heart-outline',
-                              'bar-chart-outline',
-                              'mail-outline',
-                              'information-circle-outline',
-                            ] as const
-                          )[index]
-                        }
-                        size={17}
-                        color={colors.primary}
-                      />
-                    </View>
-                    <Text style={styles.listText}>{item}</Text>
+      {/* ── 列表组 ── */}
+      <CardSurface
+        radius={24}
+        borderWidth={1.2}
+        borderColor="rgba(255, 255, 255, 0.58)"
+        style={styles.listCardWrapper}
+        contentStyle={styles.listCard}
+      >
+        <View style={styles.listContent}>
+          {profileItems.map(
+            (item, index) => (
+              <Pressable
+                key={item.title}
+                accessibilityRole="button"
+                style={({ pressed }) => [
+                  styles.listRow,
+                  index === profileItems.length - 1 && styles.listRowLast,
+                  { opacity: pressed ? 0.7 : 1 },
+                ]}
+                onPress={() => {
+                  if (item.title === 'AI 配置') {
+                    router.push('/settings/ai');
+                  } else if (item.title === '我的作品' || item.title === '收藏的灵感') {
+                    router.navigate('/album');
+                  } else {
+                    Alert.alert(item.title, '这个入口会在下一版开放。');
+                  }
+                }}
+              >
+                <View style={styles.listLeft}>
+                  <View style={styles.listIconWrap}>
+                    <Ionicons
+                      name={item.icon}
+                      size={17}
+                      color={colors.primary}
+                    />
                   </View>
-                  <Ionicons name="chevron-forward" size={17} color={colors.muted} />
-                </Pressable>
-              )
-            )}
-          </View>
+                  <Text style={styles.listText}>{item.title}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={17} color={colors.muted} />
+              </Pressable>
+            )
+          )}
         </View>
-      </View>
+      </CardSurface>
 
       <Text style={styles.quote}>“生活很普通，但值得好好拍。”</Text>
     </ScrollView>
@@ -162,26 +145,19 @@ function Tile({
   accent: string;
 }) {
   return (
-    <View style={styles.tileWrapper}>
-      <View style={styles.tile}>
-        <BlurView
-          intensity={50}
-          tint="light"
-          style={[
-            StyleSheet.absoluteFill,
-            styles.cardBlur,
-          ]}
-        />
-        <View style={[StyleSheet.absoluteFill, styles.cardBg]} />
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.tileBorder]} />
-
-        <View style={[styles.tileIconBg, { backgroundColor: accent }]}>
-          <Ionicons name={icon} size={21} color={colors.primary} />
-        </View>
-        <Text style={styles.tileTitle}>{title}</Text>
-        <Text style={styles.tileValue}>{value}</Text>
+    <CardSurface
+      radius={20}
+      borderWidth={1.1}
+      borderColor="rgba(255, 255, 255, 0.56)"
+      style={styles.tileWrapper}
+      contentStyle={styles.tile}
+    >
+      <View style={[styles.tileIconBg, { backgroundColor: accent }]}>
+        <Ionicons name={icon} size={20} color={colors.ink} />
       </View>
-    </View>
+      <Text style={styles.tileTitle}>{title}</Text>
+      <Text style={styles.tileValue}>{value}</Text>
+    </CardSurface>
   );
 }
 
@@ -196,29 +172,11 @@ const styles = StyleSheet.create({
   profileCardWrapper: {
     marginTop: 24,
     borderRadius: 26,
+    backgroundColor: 'transparent',
     ...shadows.glassMd,
   },
   profileCard: {
-    borderRadius: 26,
-    overflow: 'hidden',
-    position: 'relative',
     padding: 18,
-  },
-  cardBlur: {
-    borderRadius: 26,
-  },
-  cardBg: {
-    borderRadius: 26,
-    backgroundColor: 'rgba(255, 255, 255, 0.68)',
-  },
-  sheen: {
-    borderRadius: 26,
-    maxHeight: 34,
-  },
-  cardBorder: {
-    borderRadius: 26,
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 255, 255, 0.9)',
   },
   profileContent: {
     flexDirection: 'row',
@@ -274,19 +232,14 @@ const styles = StyleSheet.create({
   tileWrapper: {
     flex: 1,
     borderRadius: 20,
+    backgroundColor: 'transparent',
     ...shadows.glassSm,
   },
   tile: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    position: 'relative',
+    flexGrow: 1,
     padding: 13,
-    minHeight: 114,
-  },
-  tileBorder: {
-    borderRadius: 20,
-    borderWidth: 1.1,
-    borderColor: 'rgba(255, 255, 255, 0.85)',
+    paddingTop: 15,
+    minHeight: 122,
   },
   tileIconBg: {
     width: 38,
@@ -299,13 +252,14 @@ const styles = StyleSheet.create({
   },
   tileTitle: {
     color: colors.ink,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    marginTop: 10,
+    marginTop: 11,
   },
   tileValue: {
     color: colors.muted,
     fontSize: 10.5,
+    lineHeight: 15,
     marginTop: 4,
   },
 
@@ -313,16 +267,14 @@ const styles = StyleSheet.create({
   listCardWrapper: {
     borderRadius: 24,
     marginTop: 18,
+    backgroundColor: 'transparent',
     ...shadows.glassSm,
   },
   listCard: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    position: 'relative',
     paddingHorizontal: 16,
   },
   listContent: {
-    zIndex: 2,
+    width: '100%',
   },
   listRow: {
     minHeight: 54,
@@ -344,16 +296,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    overflow: 'hidden',
-    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.8)',
-  },
-  iconInnerBg: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(126, 155, 178, 0.12)',
+    backgroundColor: 'rgba(126, 155, 178, 0.14)',
   },
   listText: {
     color: colors.ink,
