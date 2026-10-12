@@ -6,6 +6,7 @@ export function RainbowBrand() {
     <View style={styles.container}>
       <Image
         source={require('../../../assets/logo.png')}
+        accessibilityLabel="Drama相机"
         style={styles.logoImage}
         resizeMode="contain"
       />
@@ -15,14 +16,14 @@ export function RainbowBrand() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 54,
+    height: 56,
     justifyContent: 'center',
     alignItems: 'flex-start',
     alignSelf: 'flex-start',
   },
   logoImage: {
-    height: 52,
     width: 165,
+    aspectRatio: 2172 / 724,
     alignSelf: 'flex-start',
   },
 });

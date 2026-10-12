@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo.png" alt="Drama 相机" width="353" />
+<img src="assets/logo.png" alt="Drama 相机" width="640" />
 
 # Drama 相机
 
