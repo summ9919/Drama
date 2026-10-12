@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   },
   logoImage: {
     width: 165,
-    aspectRatio: 2171 / 724,
+    aspectRatio: 2172 / 724,
     alignSelf: 'flex-start',
   },
 });
