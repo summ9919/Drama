@@ -31,27 +31,27 @@ export const colors = {
 };
 
 export const glass = {
-  // ── Apple 雾态玻璃材质定义 (Mist Blue Butter 调色) ──
-  lightBg: 'rgba(255, 255, 255, 0.65)',
-  lightBorder: 'rgba(255, 255, 255, 0.85)',
+  // ── 液态玻璃材质定义 (对齐导航栏高透水感质感) ──
+  lightBg: 'rgba(255, 255, 255, 0.20)',
+  lightBorder: 'rgba(255, 255, 255, 0.65)',
 
-  cardBg: 'rgba(255, 255, 255, 0.65)',
-  cardBorder: 'rgba(255, 255, 255, 0.90)',
-  cardSubtleBorder: 'rgba(215, 226, 235, 0.70)',
+  cardBg: 'rgba(255, 255, 255, 0.18)',       // 与导航栏 dockGlassBg 完全一致的高透水感底色
+  cardBorder: 'rgba(255, 255, 255, 0.65)',   // 通透柔和微光边缘
+  cardSubtleBorder: 'rgba(255, 255, 255, 0.45)',
 
   primaryBg: 'rgba(184, 201, 214, 0.25)',
-  primaryBorder: 'rgba(255, 255, 255, 0.90)',
+  primaryBorder: 'rgba(255, 255, 255, 0.75)',
 
-  butterBg: 'rgba(243, 223, 181, 0.40)',
-  butterBorder: 'rgba(255, 255, 255, 0.90)',
+  butterBg: 'rgba(243, 223, 181, 0.35)',
+  butterBorder: 'rgba(255, 255, 255, 0.75)',
 
   darkBg: 'rgba(20, 30, 38, 0.62)',
   darkBorder: 'rgba(255, 255, 255, 0.25)',
 
-  pillBg: 'rgba(255, 255, 255, 0.45)',
-  pillBorder: 'rgba(255, 255, 255, 0.85)',
+  pillBg: 'rgba(255, 255, 255, 0.22)',
+  pillBorder: 'rgba(255, 255, 255, 0.65)',
 
-  pressedBg: 'rgba(255, 255, 255, 0.88)',
+  pressedBg: 'rgba(255, 255, 255, 0.40)',
 };
 
 export const shadows = {
