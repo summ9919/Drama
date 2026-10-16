@@ -306,6 +306,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 48,
+    zIndex: 10,
   },
   heroBannerFrame: {
     width: '100%',

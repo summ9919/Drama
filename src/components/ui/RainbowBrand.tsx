@@ -16,14 +16,16 @@ export function RainbowBrand() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 56,
+    width: 144,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'flex-start',
-    alignSelf: 'flex-start',
+    overflow: 'hidden',
   },
   logoImage: {
-    width: 165,
-    aspectRatio: 2172 / 724,
-    alignSelf: 'flex-start',
+    width: 144,
+    height: 48,
+    maxWidth: 144,
+    maxHeight: 48,
   },
 });
