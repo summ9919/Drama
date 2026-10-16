@@ -2,9 +2,9 @@ import { Platform } from 'react-native';
 
 export const colors = {
   // 页面背景
-  canvas: '#FFFFFF',
-  canvasWarm: '#EFE6D6',     // 暖黄油中调底
-  paper: '#FCFDFE',          // 卡片白
+  canvas: '#FAF7F2',         // 温润奶杏柔白 (告别刺眼纯白，契合胶片画报与品牌Logo调性)
+  canvasWarm: '#F3EFE6',     // 暖黄油中调底
+  paper: '#FFFFFF',          // 卡片高光白
 
   // ── 文字 ──
   ink: '#1D2A34',            // 沉稳墨蓝灰 (高对比度深色)
