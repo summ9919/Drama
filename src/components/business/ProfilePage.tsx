@@ -26,11 +26,15 @@ const profileItems = [
 export function ProfilePage() {
   const router = useRouter();
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      <PageHeader title="我的" icon="settings-outline" />
+    <View style={styles.screen}>
+      {/* ── 顶部固定导航栏 ── */}
+      <View style={styles.fixedHeader}>
+        <PageHeader title="我的" icon="settings-outline" />
+      </View>
 
-      {/* ── 个人信息卡片 (与首页卡片保持一致的 CardSurface) ── */}
-      <CardSurface
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        {/* ── 个人信息卡片 (与首页卡片保持一致的 CardSurface) ── */}
+        <CardSurface
         radius={26}
         borderWidth={1.2}
         borderColor="rgba(255, 255, 255, 0.58)"
@@ -133,6 +137,7 @@ export function ProfilePage() {
 
       <Text style={styles.quote}>“生活很普通，但值得好好拍。”</Text>
     </ScrollView>
+    </View>
   );
 }
 
@@ -167,15 +172,29 @@ function Tile({
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: colors.canvas,
+  },
+  fixedHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 6,
+    paddingBottom: 6,
+    backgroundColor: colors.canvas,
+    zIndex: 100,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(21, 29, 36, 0.05)',
+  },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 90,
+    paddingTop: 6,
+    paddingBottom: 100,
   },
 
   /* 个人卡片 */
   profileCardWrapper: {
-    marginTop: 24,
+    marginTop: 12,
     borderRadius: 26,
     backgroundColor: 'transparent',
     ...shadows.glassMd,

@@ -23,12 +23,17 @@ export function InspirationPage({ onStartCamera }: Props) {
   ];
 
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      <PageHeader title="灵感" icon="camera-outline" onPress={onStartCamera} />
-      <Text style={styles.lead}>别急着按下快门，先看看光想把你带到哪里。</Text>
+    <View style={styles.screen}>
+      {/* ── 顶部固定导航栏 ── */}
+      <View style={styles.fixedHeader}>
+        <PageHeader title="灵感" icon="camera-outline" onPress={onStartCamera} />
+      </View>
 
-      {/* ── Apple 雾态分类胶囊栏 ── */}
-      <View style={styles.segmentRow}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <Text style={styles.lead}>别急着按下快门，先看看光想把你带到哪里。</Text>
+
+        {/* ── Apple 雾态分类胶囊栏 ── */}
+        <View style={styles.segmentRow}>
         {['全部', '人像', '风景', '夜景'].map((item) => {
           const active = category === item;
           return (
@@ -123,21 +128,36 @@ export function InspirationPage({ onStartCamera }: Props) {
         ))}
       </View>
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: colors.canvas,
+  },
+  fixedHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 6,
+    paddingBottom: 6,
+    backgroundColor: colors.canvas,
+    zIndex: 100,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(21, 29, 36, 0.05)',
+  },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 90,
+    paddingTop: 4,
+    paddingBottom: 100,
   },
   lead: {
     color: colors.muted,
     fontSize: 13.5,
     lineHeight: 21,
-    marginTop: 14,
-    marginBottom: 18,
+    marginTop: 10,
+    marginBottom: 16,
     letterSpacing: 0.2,
   },
 

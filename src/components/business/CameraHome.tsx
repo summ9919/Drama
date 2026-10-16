@@ -24,18 +24,21 @@ type Props = {
 
 export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      {/* ── 顶部官方品牌 Logo 栏 ── */}
-      <View style={styles.brandRow}>
-        <RainbowBrand />
-        <IconButton
-          icon="sparkles-outline"
-          onPress={() => Alert.alert('今日光影提示', '慢一点按下快门，先观察光线如何拂过被摄物的轮廓。')}
-        />
+    <View style={styles.screen}>
+      {/* ── 顶部固定官方品牌 Logo 导航栏 ── */}
+      <View style={styles.fixedBrandHeader}>
+        <View style={styles.brandRow}>
+          <RainbowBrand />
+          <IconButton
+            icon="sparkles-outline"
+            onPress={() => Alert.alert('今日光影提示', '慢一点按下快门，先观察光线如何拂过被摄物的轮廓。')}
+          />
+        </View>
       </View>
 
-      {/* ── 核心一体化时尚取景器卡片 ── */}
-      <View style={styles.heroCardWrapper}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        {/* ── 核心一体化时尚取景器卡片 ── */}
+        <View style={styles.heroCardWrapper}>
         <CardSurface
           radius={26}
           borderWidth={1.2}
@@ -163,6 +166,7 @@ export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
         </ScrollView>
       </View>
     </ScrollView>
+    </View>
   );
 }
 
@@ -198,22 +202,35 @@ function FeatureCard({
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: colors.canvas,
+  },
+  fixedBrandHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 6,
+    paddingBottom: 6,
+    backgroundColor: colors.canvas,
+    zIndex: 100,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(21, 29, 36, 0.05)',
+  },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 95,
+    paddingTop: 12,
+    paddingBottom: 100,
   },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     minHeight: 48,
-    zIndex: 10,
   },
 
   /* 核心取景器一体化卡片 */
   heroCardWrapper: {
-    marginTop: 16,
+    marginTop: 6,
     ...shadows.glassMd,
   },
   heroCardSurface: {

@@ -51,11 +51,15 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
   });
 
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      <PageHeader title="我的相册" icon="options-outline" />
+    <View style={styles.screen}>
+      {/* ── 顶部固定导航栏 ── */}
+      <View style={styles.fixedHeader}>
+        <PageHeader title="我的相册" icon="options-outline" />
+      </View>
 
-      {/* ── 极简小清新光影统计卡片 ── */}
-      <View style={styles.statsCardWrapper}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        {/* ── 极简小清新光影统计卡片 ── */}
+        <View style={styles.statsCardWrapper}>
         <View style={styles.statsCard}>
           {/* 毛玻璃底层 */}
           <BlurView
@@ -314,19 +318,34 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
         )}
       </Modal>
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: colors.canvas,
+  },
+  fixedHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 6,
+    paddingBottom: 6,
+    backgroundColor: colors.canvas,
+    zIndex: 100,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(21, 29, 36, 0.05)',
+  },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 90,
+    paddingTop: 8,
+    paddingBottom: 100,
   },
 
   /* 统计卡片 */
   statsCardWrapper: {
-    marginTop: 22,
+    marginTop: 10,
     borderRadius: 26,
     ...shadows.glassSm,
   },

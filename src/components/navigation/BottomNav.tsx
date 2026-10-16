@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -35,12 +36,12 @@ const iconsFilled: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottomPadding = Math.max(insets.bottom, 12);
+  const bottomPadding = Platform.OS === 'web' ? 16 : Math.max(insets.bottom, 12);
 
   return (
     <View pointerEvents="box-none" style={[styles.wrapper, { paddingBottom: bottomPadding }]}>
       {/* 居中透明底栏容器 */}
-      <View style={styles.dockCapsule}>
+      <View style={styles.dockCapsule} pointerEvents="auto">
         {/* 背景高通透毛玻璃底层 */}
         <View style={[StyleSheet.absoluteFill, styles.dockBgContainer]} pointerEvents="none">
           <BlurView
@@ -126,7 +127,7 @@ export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps)
 
 const styles = StyleSheet.create({
   wrapper: {
-    position: 'absolute',
+    position: (Platform.OS === 'web' ? 'fixed' : 'absolute') as any,
     bottom: 0,
     left: 0,
     right: 0,
@@ -134,11 +135,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'transparent',
     paddingHorizontal: 16,
+    zIndex: 9999,
   },
   dockCapsule: {
     borderRadius: 9999,
     position: 'relative',
     padding: 5,
+    pointerEvents: 'auto' as any,
     ...shadows.glassMd,
   },
   dockBgContainer: {
