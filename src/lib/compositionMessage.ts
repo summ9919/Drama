@@ -2,8 +2,33 @@ import type { CompositionTarget } from './compositionTarget';
 import type { GuidanceResult, GuidanceStatus } from '../types/guidance';
 import { getDirectionCue } from './guidanceDirection';
 import type { ExecutionPhase } from './guidanceExecution';
+import type { PoseMatchDetail } from './poseMatching';
 
-export function getCompositionMessage(enabled: boolean, target: CompositionTarget | null, result: GuidanceResult | null, adjustingZoom: boolean, autoZoom: boolean, status?: GuidanceStatus, phase?: ExecutionPhase) {
+export function getCompositionMessage(
+  enabled: boolean,
+  target: CompositionTarget | null,
+  result: GuidanceResult | null,
+  adjustingZoom: boolean,
+  autoZoom: boolean,
+  status?: GuidanceStatus,
+  phase?: ExecutionPhase,
+  poseEnabled?: boolean,
+  poseMatch?: PoseMatchDetail
+) {
+  // 如果开启了姿势引导
+  if (poseEnabled && poseMatch) {
+    if (!poseMatch.matched) {
+      return poseMatch.feedbackTip;
+    }
+    // 姿势匹配了，若构图也开启了但未就绪
+    if (enabled && phase !== 'ready' && target?.phase !== 'ready') {
+      return '姿势已就绪，请继续微调手机对准构图圈';
+    }
+    if ((!enabled || phase === 'ready') && poseMatch.matched) {
+      return '✦ 姿势与构图完美，可以拍照了';
+    }
+  }
+
   if (status?.phase === 'error') return '指导暂未更新，请查看下方原因';
   if (!enabled) return '开启 AI 指导，获取构图终点';
   if (adjustingZoom) return '正在微调缩放，请稳住手机';
