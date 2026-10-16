@@ -2,8 +2,8 @@ import { Platform } from 'react-native';
 
 export const colors = {
   // 页面背景
-  canvas: '#FAF7F2',         // 温润奶杏柔白 (告别刺眼纯白，契合胶片画报与品牌Logo调性)
-  canvasWarm: '#F3EFE6',     // 暖黄油中调底
+  canvas: '#C8C6C2',         // 羊绒暖调素灰
+  canvasWarm: '#BEBCB8',     // 稍深一档的过渡灰底
   paper: '#FFFFFF',          // 卡片高光白
 
   // ── 文字 ──
