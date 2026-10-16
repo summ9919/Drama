@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   segmentActiveBg: {
     borderRadius: 18,
-    backgroundColor: 'rgba(45, 117, 101, 0.12)',
+    backgroundColor: 'rgba(45, 106, 148, 0.12)',
   },
   segmentInactiveBg: {
     borderRadius: 18,

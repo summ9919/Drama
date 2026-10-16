@@ -41,7 +41,7 @@ export function ProfilePage() {
           {/* 头像 */}
           <View style={styles.avatarWrapper}>
             <LinearGradient
-              colors={['#3B8E7B', '#2D7565']}
+              colors={['#4685B0', '#2D6A94']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.avatar}
@@ -66,7 +66,7 @@ export function ProfilePage() {
           icon="color-palette-outline"
           title="我的风格"
           value="4种清新预设"
-          accent="rgba(45, 117, 101, 0.12)"
+          accent="rgba(45, 106, 148, 0.12)"
           iconColor={colors.primary}
         />
         <Tile
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.85)',
-    backgroundColor: 'rgba(45, 117, 101, 0.08)',
+    backgroundColor: 'rgba(45, 106, 148, 0.08)',
   },
   listText: {
     color: colors.ink,

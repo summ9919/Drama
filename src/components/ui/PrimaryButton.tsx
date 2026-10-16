@@ -48,11 +48,11 @@ export function PrimaryButton({
   const isDark = variant === 'dark';
   const isGlass = variant === 'glass';
 
-  // 清新薄荷青瓷质感渐变 (#388B79 -> #2D7565)
+  // 清新晴空霁蓝质感渐变 (#3778A2 -> #2D6A94)
   const primaryGradients: [string, string, string] = [
-    'rgba(56, 139, 121, 0.95)',
-    'rgba(45, 117, 101, 0.95)',
-    'rgba(34, 95, 81, 0.98)',
+    'rgba(55, 120, 162, 0.96)',
+    'rgba(45, 106, 148, 0.96)',
+    'rgba(35, 88, 126, 0.98)',
   ];
 
   // ── 从左往右发光扫光动画 ──
@@ -154,7 +154,7 @@ export function PrimaryButton({
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: pressed ? 'rgba(45, 117, 101, 0.16)' : 'rgba(45, 117, 101, 0.08)' },
+                { backgroundColor: pressed ? 'rgba(45, 106, 148, 0.16)' : 'rgba(45, 106, 148, 0.08)' },
               ]}
             />
           )}
@@ -163,8 +163,8 @@ export function PrimaryButton({
             <LinearGradient
               colors={
                 pressed
-                  ? ['rgba(40, 105, 91, 0.95)', 'rgba(30, 85, 73, 0.95)']
-                  : ['rgba(50, 126, 110, 0.92)', 'rgba(38, 102, 88, 0.92)']
+                  ? ['rgba(40, 95, 135, 0.95)', 'rgba(30, 78, 112, 0.95)']
+                  : ['rgba(48, 112, 154, 0.92)', 'rgba(38, 92, 130, 0.92)']
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 0.8, y: 1 }}

@@ -14,12 +14,12 @@ export const colors = {
   // ── 线条 ──
   line: 'rgba(21, 29, 36, 0.08)', // 极细空气描边
 
-  // ── 品牌核心色 (清透薄荷青瓷与冰蓝点缀，纯正小清新) ──
-  primary: '#2D7565',        // 晨露薄荷深青 (精致、专业、时尚自然)
-  primaryLight: '#439281',   // 灵动明亮薄荷青
-  primarySoft: 'rgba(45, 117, 101, 0.12)', // 极浅薄荷光晕
-  mistBlue: '#8FAEC5',       // 清风霁蓝
-  mistBlueLight: '#E8F1F8',  // 空气冰蓝底
+  // ── 品牌核心色 (清透晴空海盐蓝与冰蓝点缀，纯正时尚小清新) ──
+  primary: '#2D6A94',        // 清澈深霁蓝 (纯净、专业、时尚自然)
+  primaryLight: '#4782AA',   // 灵动晴空蓝
+  primarySoft: 'rgba(45, 106, 148, 0.12)', // 极浅晴空微光
+  mistBlue: '#7FA7C4',       // 清风霁蓝
+  mistBlueLight: '#EAF2F8',  // 空气冰蓝底
   secondary: '#5C8BA6',      // 优雅海盐蓝
   butter: '#F5DEB3',         // 奶油暖黄
   butterWarm: '#FAF0DB',     // 柔焦杏白
@@ -41,8 +41,8 @@ export const glass = {
   cardBorder: 'rgba(255, 255, 255, 0.90)',   // 细腻光泽边缘
   cardSubtleBorder: 'rgba(21, 29, 36, 0.06)',
 
-  primaryBg: 'rgba(45, 117, 101, 0.10)',
-  primaryBorder: 'rgba(45, 117, 101, 0.30)',
+  primaryBg: 'rgba(45, 106, 148, 0.10)',
+  primaryBorder: 'rgba(45, 106, 148, 0.28)',
 
   butterBg: 'rgba(245, 222, 179, 0.28)',
   butterBorder: 'rgba(255, 255, 255, 0.90)',
@@ -79,7 +79,7 @@ export const shadows = {
     elevation: 7,
   },
   glassPrimaryGlow: {
-    shadowColor: '#2D7565',
+    shadowColor: '#2D6A94',
     shadowOpacity: 0.22,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 },

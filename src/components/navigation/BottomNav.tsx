@@ -175,12 +175,12 @@ const styles = StyleSheet.create({
   },
   activePillBg: {
     borderRadius: 9999,
-    backgroundColor: 'rgba(45, 117, 101, 0.12)',
+    backgroundColor: 'rgba(45, 106, 148, 0.12)',
   },
   activePillBorder: {
     borderRadius: 9999,
     borderWidth: 1,
-    borderColor: 'rgba(45, 117, 101, 0.22)',
+    borderColor: 'rgba(45, 106, 148, 0.22)',
   },
   tabLabel: {
     color: '#7E8F9B',

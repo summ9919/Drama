@@ -149,7 +149,7 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
                       borderRadius: 18,
                       borderWidth: 1.1,
                       borderColor: active
-                        ? 'rgba(45, 117, 101, 0.25)'
+                        ? 'rgba(45, 106, 148, 0.25)'
                         : 'rgba(255, 255, 255, 0.85)',
                     },
                   ]}
@@ -382,12 +382,12 @@ const styles = StyleSheet.create({
   },
   badgeBg: {
     borderRadius: 14,
-    backgroundColor: 'rgba(45, 117, 101, 0.10)',
+    backgroundColor: 'rgba(45, 106, 148, 0.10)',
   },
   badgeBorder: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(45, 117, 101, 0.20)',
+    borderColor: 'rgba(45, 106, 148, 0.20)',
   },
   date: {
     color: colors.primary,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   },
   pillActiveBg: {
     borderRadius: 18,
-    backgroundColor: 'rgba(45, 117, 101, 0.12)',
+    backgroundColor: 'rgba(45, 106, 148, 0.12)',
   },
   pillInactiveBg: {
     borderRadius: 18,

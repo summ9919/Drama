@@ -99,7 +99,7 @@ export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
           icon="compass-outline"
           title="实时指导"
           body="机位 · 焦段 · 光线"
-          accent="rgba(45, 117, 101, 0.12)"
+          accent="rgba(45, 106, 148, 0.12)"
           iconColor={colors.primary}
         />
         <FeatureCard
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#3ECF8E',
+    backgroundColor: '#4AA3FF',
   },
   lensPillText: {
     color: '#FFFFFF',
