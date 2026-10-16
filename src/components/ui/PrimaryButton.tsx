@@ -48,11 +48,11 @@ export function PrimaryButton({
   const isDark = variant === 'dark';
   const isGlass = variant === 'glass';
 
-  // 04 MIST BLUE BUTTER 雾态玻璃质感渐变 (#B8C9D6 -> #F3DFB5)
+  // 清新薄荷青瓷质感渐变 (#388B79 -> #2D7565)
   const primaryGradients: [string, string, string] = [
-    'rgba(126, 155, 178, 0.92)',
-    'rgba(184, 201, 214, 0.85)',
-    'rgba(243, 223, 181, 0.88)',
+    'rgba(56, 139, 121, 0.95)',
+    'rgba(45, 117, 101, 0.95)',
+    'rgba(34, 95, 81, 0.98)',
   ];
 
   // ── 从左往右发光扫光动画 ──
@@ -132,7 +132,7 @@ export function PrimaryButton({
         >
           {/* Apple 磨砂模糊层 */}
           <BlurView
-            intensity={isDark ? 60 : 50}
+            intensity={isDark ? 60 : 45}
             tint={isDark ? 'dark' : 'light'}
             style={[
               StyleSheet.absoluteFill,
@@ -154,7 +154,7 @@ export function PrimaryButton({
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: pressed ? 'rgba(212, 225, 234, 0.85)' : 'rgba(212, 225, 234, 0.55)' },
+                { backgroundColor: pressed ? 'rgba(45, 117, 101, 0.16)' : 'rgba(45, 117, 101, 0.08)' },
               ]}
             />
           )}
@@ -163,8 +163,8 @@ export function PrimaryButton({
             <LinearGradient
               colors={
                 pressed
-                  ? ['rgba(78, 108, 130, 0.96)', 'rgba(60, 88, 108, 0.96)']
-                  : ['rgba(96, 128, 152, 0.90)', 'rgba(76, 106, 128, 0.92)']
+                  ? ['rgba(40, 105, 91, 0.95)', 'rgba(30, 85, 73, 0.95)']
+                  : ['rgba(50, 126, 110, 0.92)', 'rgba(38, 102, 88, 0.92)']
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 0.8, y: 1 }}
@@ -174,7 +174,7 @@ export function PrimaryButton({
 
           {isButter && (
             <LinearGradient
-              colors={['rgba(243, 223, 181, 0.92)', 'rgba(248, 233, 201, 0.82)']}
+              colors={['rgba(245, 235, 218, 0.92)', 'rgba(250, 240, 225, 0.85)']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFill}

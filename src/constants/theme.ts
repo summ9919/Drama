@@ -1,94 +1,96 @@
 import { Platform } from 'react-native';
 
 export const colors = {
-  // 页面背景
-  canvas: '#C8C6C2',         // 羊绒暖调素灰
-  canvasWarm: '#BEBCB8',     // 稍深一档的过渡灰底
-  paper: '#FFFFFF',          // 卡片高光白
+  // ── 纯净小清新背景 (空气感、高通透、告别死板与灰暗) ──
+  canvas: '#F7F8FA',         // 清透微氧柔白 (极净自然，明亮通透)
+  canvasWarm: '#F0F2F5',     // 柔和微冷过渡白
+  paper: '#FFFFFF',          // 纯净雪白
 
-  // ── 文字 ──
-  ink: '#1D2A34',            // 沉稳墨蓝灰 (高对比度深色)
-  muted: '#5A6975',          // 雾岩灰 (高清晰度次要文字)
-  subtle: '#7E8F9D',         // 次要微灰
+  // ── 现代时尚文字 ──
+  ink: '#151D24',            // 极致深邃墨黑 (顶级对比与阅读质感)
+  muted: '#687785',          // 晨雾柔灰 (舒适不扎眼)
+  subtle: '#94A3B1',         // 极轻弱化文字
 
   // ── 线条 ──
-  line: '#CAD7E2',           // 雾蓝分隔线
+  line: 'rgba(21, 29, 36, 0.08)', // 极细空气描边
 
-  // ── 品牌核心色 (04 MIST BLUE BUTTER 专属色板) ──
-  primary: '#6E8EA7',        // 雾蓝焦点主色
-  mistBlue: '#B8C9D6',       // 雾蓝 (Mist Blue #B8C9D6)
-  mistBlueLight: '#D4E1EA',  // 浅雾蓝
-  secondary: '#8EAABF',      // 中间过渡雾蓝
-  butter: '#F3DFB5',         // 黄油奶油色 (Butter Cream #F3DFB5)
-  butterWarm: '#F8E9C9',     // 柔暖奶油
-  slate: '#66717B',          // 板岩灰 (Slate Gray #66717B)
+  // ── 品牌核心色 (清透薄荷青瓷与冰蓝点缀，纯正小清新) ──
+  primary: '#2D7565',        // 晨露薄荷深青 (精致、专业、时尚自然)
+  primaryLight: '#439281',   // 灵动明亮薄荷青
+  primarySoft: 'rgba(45, 117, 101, 0.12)', // 极浅薄荷光晕
+  mistBlue: '#8FAEC5',       // 清风霁蓝
+  mistBlueLight: '#E8F1F8',  // 空气冰蓝底
+  secondary: '#5C8BA6',      // 优雅海盐蓝
+  butter: '#F5DEB3',         // 奶油暖黄
+  butterWarm: '#FAF0DB',     // 柔焦杏白
+  slate: '#546370',          // 雅致冷岩灰
 
   // ── 辅助装饰色 ──
-  paleMist: '#D6E4EE',       // 浅雾蓝底块
-  paleButter: '#F7EDD5',     // 浅黄油底块
-  dark: '#141E26',           // 相机深色背景
-  whiteWarm: '#FEFDFB',      // 温暖珍珠白
+  paleMist: '#EDF4F9',       // 浅冰蓝底块
+  paleButter: '#FDF7EB',     // 浅米油底块
+  dark: '#11181F',           // 取景器专业暗黑
+  whiteWarm: '#FFFFFF',      // 纯白
 };
 
 export const glass = {
-  // ── 液态玻璃材质定义 (对齐导航栏高透水感质感) ──
-  lightBg: 'rgba(255, 255, 255, 0.20)',
-  lightBorder: 'rgba(255, 255, 255, 0.65)',
+  // ── 现代微光液态玻璃材质 (极轻盈、清澈水润) ──
+  lightBg: 'rgba(255, 255, 255, 0.82)',
+  lightBorder: 'rgba(255, 255, 255, 0.95)',
 
-  cardBg: 'rgba(255, 255, 255, 0.18)',       // 与导航栏 dockGlassBg 完全一致的高透水感底色
-  cardBorder: 'rgba(255, 255, 255, 0.65)',   // 通透柔和微光边缘
-  cardSubtleBorder: 'rgba(255, 255, 255, 0.45)',
+  cardBg: 'rgba(255, 255, 255, 0.78)',       // 通透澄澈微光白
+  cardBorder: 'rgba(255, 255, 255, 0.90)',   // 细腻光泽边缘
+  cardSubtleBorder: 'rgba(21, 29, 36, 0.06)',
 
-  primaryBg: 'rgba(184, 201, 214, 0.25)',
-  primaryBorder: 'rgba(255, 255, 255, 0.75)',
+  primaryBg: 'rgba(45, 117, 101, 0.10)',
+  primaryBorder: 'rgba(45, 117, 101, 0.30)',
 
-  butterBg: 'rgba(243, 223, 181, 0.35)',
-  butterBorder: 'rgba(255, 255, 255, 0.75)',
+  butterBg: 'rgba(245, 222, 179, 0.28)',
+  butterBorder: 'rgba(255, 255, 255, 0.90)',
 
-  darkBg: 'rgba(20, 30, 38, 0.62)',
-  darkBorder: 'rgba(255, 255, 255, 0.25)',
+  darkBg: 'rgba(17, 24, 31, 0.75)',
+  darkBorder: 'rgba(255, 255, 255, 0.20)',
 
-  pillBg: 'rgba(255, 255, 255, 0.22)',
-  pillBorder: 'rgba(255, 255, 255, 0.65)',
+  pillBg: 'rgba(255, 255, 255, 0.88)',
+  pillBorder: 'rgba(255, 255, 255, 0.95)',
 
-  pressedBg: 'rgba(255, 255, 255, 0.40)',
+  pressedBg: 'rgba(255, 255, 255, 0.95)',
 };
 
 export const shadows = {
   glassSm: {
-    shadowColor: '#1A2933',
-    shadowOpacity: 0.07,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#1A2936',
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
     elevation: 2,
   },
   glassMd: {
-    shadowColor: '#1A2933',
-    shadowOpacity: 0.10,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
+    shadowColor: '#1A2936',
+    shadowOpacity: 0.07,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
   },
   glassLg: {
-    shadowColor: '#1A2933',
-    shadowOpacity: 0.14,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 8,
+    shadowColor: '#1A2936',
+    shadowOpacity: 0.10,
+    shadowRadius: 28,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 7,
   },
   glassPrimaryGlow: {
-    shadowColor: '#6E8EA7',
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
+    shadowColor: '#2D7565',
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 5,
   },
   glassDark: {
     shadowColor: '#000000',
-    shadowOpacity: 0.28,
-    shadowRadius: 14,
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
+    elevation: 4,
   },
 };
 
@@ -97,4 +99,4 @@ export const fonts = {
   body: Platform.select({ ios: 'System', default: 'sans-serif' }) as string,
 };
 
-export const radii = { sm: 12, md: 18, lg: 24, xl: 28, full: 9999 };
+export const radii = { sm: 14, md: 20, lg: 26, xl: 32, full: 9999 };

@@ -134,17 +134,18 @@ const styles = StyleSheet.create({
   },
   lead: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 22,
-    marginTop: 22,
+    fontSize: 13.5,
+    lineHeight: 21,
+    marginTop: 14,
     marginBottom: 18,
+    letterSpacing: 0.2,
   },
 
   /* 胶囊筛选 */
   segmentRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 20,
+    marginBottom: 18,
   },
   segmentWrapper: {
     borderRadius: 18,
@@ -154,8 +155,8 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     overflow: 'hidden',
     position: 'relative',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 7.5,
+    paddingHorizontal: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -164,11 +165,11 @@ const styles = StyleSheet.create({
   },
   segmentActiveBg: {
     borderRadius: 18,
-    backgroundColor: 'rgba(126, 155, 178, 0.25)',
+    backgroundColor: 'rgba(45, 117, 101, 0.12)',
   },
   segmentInactiveBg: {
     borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
   },
   segmentText: {
     color: colors.muted,
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   segmentTextActive: {
-    color: colors.ink,
+    color: colors.primary,
     fontWeight: '700',
   },
 

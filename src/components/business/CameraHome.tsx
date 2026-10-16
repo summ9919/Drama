@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Alert,
-  Animated,
   Image,
   Pressable,
   ScrollView,
@@ -10,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, shadows } from '../../constants/theme';
 import { editorialShots } from '../../constants/data';
 import { IconButton } from '../ui/IconButton';
@@ -24,12 +23,6 @@ type Props = {
 };
 
 export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
-  const kickerText = permissionGranted ? '准备好了' : '第一次使用';
-  const titleText = permissionGranted ? '进入Drama取景器' : '允许使用相机';
-  const typedKicker = useTypewriter(kickerText, 110, 0);
-  const typedTitle = useTypewriter(titleText, 115, 350, true, 2000, 55);
-  const fadeAnim = useFadeIn(600, 200);
-
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       {/* ── 顶部官方品牌 Logo 栏 ── */}
@@ -37,98 +30,107 @@ export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
         <RainbowBrand />
         <IconButton
           icon="sparkles-outline"
-          onPress={() => Alert.alert('今日提示', '慢一点，先找到光落下来的位置。')}
+          onPress={() => Alert.alert('今日光影提示', '慢一点按下快门，先观察光线如何拂过被摄物的轮廓。')}
         />
       </View>
 
-      {/* ── GIF 功能展示区 ── */}
-      <Animated.View style={[styles.heroBannerFrame, { opacity: fadeAnim }]}>
-        <Image
-          source={require('../../../assets/drama-mobile-feature-banner.gif')}
-          style={styles.heroBanner}
-          resizeMode="cover"
-          accessible
-          accessibilityLabel="Drama相机功能展示"
-        />
-      </Animated.View>
+      {/* ── 核心一体化时尚取景器卡片 ── */}
+      <View style={styles.heroCardWrapper}>
+        <CardSurface
+          radius={26}
+          borderWidth={1.2}
+          borderColor="rgba(255, 255, 255, 0.75)"
+          style={styles.heroCardSurface}
+          contentStyle={styles.heroCardContent}
+        >
+          {/* 取景器动态演示画面 */}
+          <View style={styles.viewfinderFrame}>
+            <Image
+              source={require('../../../assets/drama-mobile-feature-banner.gif')}
+              style={styles.heroBanner}
+              resizeMode="cover"
+              accessible
+              accessibilityLabel="Drama相机功能展示"
+            />
 
-      {/* ── Apple 雾态玻璃权限卡片 ── */}
-      <CardSurface
-        radius={28}
-        borderWidth={1.2}
-        borderColor="rgba(255, 255, 255, 0.58)"
-        style={styles.permissionCardWrapper}
-        contentStyle={styles.permissionCard}
-      >
-          {/* 内容 */}
-          <View style={styles.cardContent}>
-            <View style={styles.permissionIconWrapper}>
-              <BlurView
-                intensity={40}
-                tint="light"
-                style={StyleSheet.absoluteFill}
-              />
-              <View style={styles.iconGlowBg} />
-              <MaterialCommunityIcons name="camera-iris" size={30} color={colors.primary} />
+            {/* 极简取景器辅助标记 */}
+            <View pointerEvents="none" style={styles.viewfinderOverlay}>
+              <View style={styles.cornerTL} />
+              <View style={styles.cornerTR} />
+              <View style={styles.cornerBL} />
+              <View style={styles.cornerBR} />
+
+              {/* 取景器光标状态药丸 */}
+              <View style={styles.lensPill}>
+                <BlurView intensity={45} tint="dark" style={StyleSheet.absoluteFill} />
+                <View style={styles.lensPillDot} />
+                <Text style={styles.lensPillText}>AI 构图指引 · 实时就绪</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* 底部行动与说明区 */}
+          <View style={styles.heroActionArea}>
+            <View style={styles.heroHeadlineBlock}>
+              <Text style={styles.heroKicker}>NATURAL LIGHT & COMPOSITION</Text>
+              <Text style={styles.heroTitle}>
+                让日常随拍，拥有电影般的<Text style={styles.heroTitleHighlight}>呼吸感</Text>
+              </Text>
+              <Text style={styles.heroSubtitle}>
+                AI 实时机位指引 · 胶片预设色调 · 细腻光影感知
+              </Text>
             </View>
 
-            <Text style={styles.kicker}>{typedKicker}</Text>
-            <Text style={styles.permissionTitle}>{renderHighlightedTitle(typedTitle)}</Text>
-
-            {!permissionGranted && (
-              <Text style={styles.permissionBody}>
-                我们会用相机帮你看见光线、人物和更舒服的角度。
-              </Text>
-            )}
-
-            <View style={styles.buttonContainer}>
+            <View style={styles.heroButtonWrapper}>
               <PrimaryButton
-                label={permissionGranted ? '开始拍摄' : '开启相机'}
+                label={permissionGranted ? '进入取景器' : '开启相机'}
                 onPress={onOpenCamera}
-                variant="glass"
+                variant="primary"
                 icon={permissionGranted ? 'camera-outline' : 'sparkles-outline'}
               />
             </View>
-
-            <Text style={styles.later}>稍后设置也可以</Text>
           </View>
-      </CardSurface>
+        </CardSurface>
+      </View>
 
-      {/* ── 三大特性 (Apple 雾态玻璃小方块) ── */}
+      {/* ── 三大特性小清新方块 ── */}
       <View style={styles.featureRow}>
         <FeatureCard
           icon="compass-outline"
           title="实时指导"
-          body="机位 · 光线 · 焦段"
-          accent="rgba(184, 201, 214, 0.32)"
+          body="机位 · 焦段 · 光线"
+          accent="rgba(45, 117, 101, 0.12)"
+          iconColor={colors.primary}
         />
         <FeatureCard
           icon="color-palette-outline"
           title="一键风格"
           body="6 种清透预设"
-          accent="rgba(243, 223, 181, 0.48)"
+          accent="rgba(143, 174, 197, 0.20)"
+          iconColor="#45738E"
         />
         <FeatureCard
           icon="albums-outline"
           title="本地保存"
           body="每份灵感都留住"
-          accent="rgba(102, 113, 123, 0.16)"
+          accent="rgba(245, 222, 179, 0.35)"
+          iconColor="#8A6D34"
         />
       </View>
 
-      {/* ── 今日灵感：完整呈现时尚大片（无多余AI文案、无箭头、主体完整展示） ── */}
+      {/* ── 今日灵感：时尚大片横滑画廊 ── */}
       <View style={styles.editorialSection}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>今日灵感</Text>
+          <Text style={styles.sectionTitle}>今日光影灵感</Text>
+          <Text style={styles.sectionSubtitle}>滑动探索构图预设</Text>
         </View>
 
-        {/* 时尚大片横滑画廊 */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.editorialScroll}
           decelerationRate="fast"
-          snapToInterval={286}
+          snapToInterval={284}
           snapToAlignment="start"
         >
           {editorialShots.map((item) => (
@@ -141,13 +143,13 @@ export function CameraHome({ permissionGranted, onOpenCamera }: Props) {
               onPress={onOpenCamera}
             >
               <View style={styles.editorialCard}>
-                {/* 3:4 比例大片完整呈现，无画面遮挡 */}
+                {/* 3:4 比例大片 */}
                 <Image source={item.image} style={styles.editorialImage} />
 
-                {/* 水晶边缘反光描边 */}
+                {/* 边缘微光反光描边 */}
                 <View pointerEvents="none" style={styles.cardBorderOverlay} />
 
-                {/* 极简雾态小药丸标签 (无箭头、极简文字、不遮挡人物与衣服主体) */}
+                {/* 极简雾态小药丸标签 */}
                 <View style={styles.minimalGlassTag}>
                   <BlurView intensity={50} tint="light" style={StyleSheet.absoluteFill} />
                   <View style={styles.tagGlassBg} />
@@ -170,136 +172,35 @@ function FeatureCard({
   title,
   body,
   accent,
+  iconColor,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   body: string;
   accent: string;
+  iconColor?: string;
 }) {
   return (
     <CardSurface
       radius={20}
       borderWidth={1.1}
-      borderColor="rgba(255, 255, 255, 0.56)"
+      borderColor="rgba(255, 255, 255, 0.65)"
       style={styles.featureItemWrapper}
       contentStyle={styles.featureItem}
     >
-        <View style={[styles.featureIconBg, { backgroundColor: accent }]}>
-          <Ionicons name={icon} size={20} color={colors.ink} />
-        </View>
-        <Text style={styles.featureTitle}>{title}</Text>
-        <Text style={styles.featureBody}>{body}</Text>
+      <View style={[styles.featureIconBg, { backgroundColor: accent }]}>
+        <Ionicons name={icon} size={20} color={iconColor ?? colors.ink} />
+      </View>
+      <Text style={styles.featureTitle}>{title}</Text>
+      <Text style={styles.featureBody}>{body}</Text>
     </CardSurface>
   );
-}
-
-/* ── 打字机 Hook (支持无限循环打字/回退) ── */
-function useTypewriter(
-  text: string,
-  speed: number,
-  delay: number,
-  loop: boolean = false,
-  pauseDelay: number = 2000,
-  deleteSpeed: number = 60
-) {
-  const [displayText, setDisplayText] = useState('');
-
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-    let isDeleting = false;
-    let currentIndex = 0;
-    let isMounted = true;
-
-    const tick = () => {
-      if (!isMounted) return;
-
-      if (!isDeleting) {
-        // 正向打字
-        if (currentIndex < text.length) {
-          currentIndex += 1;
-          setDisplayText(text.slice(0, currentIndex));
-          timeoutId = setTimeout(tick, speed);
-        } else {
-          // 打字完成：若开启循环，停留片刻后开始回退删除
-          if (loop) {
-            isDeleting = true;
-            timeoutId = setTimeout(tick, pauseDelay);
-          }
-        }
-      } else {
-        // 回退删除
-        if (currentIndex > 0) {
-          currentIndex -= 1;
-          setDisplayText(text.slice(0, currentIndex));
-          timeoutId = setTimeout(tick, deleteSpeed);
-        } else {
-          // 删除完毕，稍作停顿后重新打字，实现无休止循环
-          isDeleting = false;
-          timeoutId = setTimeout(tick, 450);
-        }
-      }
-    };
-
-    // 初始延迟启动
-    timeoutId = setTimeout(tick, delay);
-
-    return () => {
-      isMounted = false;
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [text, speed, delay, loop, pauseDelay, deleteSpeed]);
-
-  return displayText;
-}
-
-/* ── 渐入动画 Hook ── */
-function useFadeIn(duration: number, delay: number) {
-  const anim = React.useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      Animated.timing(anim, { toValue: 1, duration, useNativeDriver: true }).start();
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [anim, delay, duration]);
-
-  return anim;
-}
-
-/* ── 标题高亮 Drama 品牌色 ── */
-function renderHighlightedTitle(text: string) {
-  if (!text) return null;
-  const dramaIndex = text.indexOf('Drama');
-  if (dramaIndex !== -1) {
-    const before = text.slice(0, dramaIndex);
-    const after = text.slice(dramaIndex + 5);
-    return (
-      <Text>
-        {before}
-        <Text style={styles.dramaHighlight}>Drama</Text>
-        {after}
-      </Text>
-    );
-  }
-  // 打字机正在输入 "D", "Dr", "Dra", "Dram" 过程中的平滑高亮
-  const dIndex = text.indexOf('D');
-  if (dIndex !== -1) {
-    const before = text.slice(0, dIndex);
-    const dramaPartial = text.slice(dIndex);
-    return (
-      <Text>
-        {before}
-        <Text style={styles.dramaHighlight}>{dramaPartial}</Text>
-      </Text>
-    );
-  }
-  return text;
 }
 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 10,
     paddingBottom: 95,
   },
   brandRow: {
@@ -309,106 +210,152 @@ const styles = StyleSheet.create({
     minHeight: 48,
     zIndex: 10,
   },
-  heroBannerFrame: {
+
+  /* 核心取景器一体化卡片 */
+  heroCardWrapper: {
+    marginTop: 16,
+    ...shadows.glassMd,
+  },
+  heroCardSurface: {
+    borderRadius: 26,
+  },
+  heroCardContent: {
+    padding: 12,
+  },
+  viewfinderFrame: {
     width: '100%',
-    aspectRatio: 1.925,
-    marginTop: 26,
-    marginBottom: 24,
-    borderRadius: 22,
+    aspectRatio: 1.85,
+    borderRadius: 18,
     overflow: 'hidden',
-    backgroundColor: '#D7E2E8',
-    borderWidth: 1,
-    borderColor: 'rgba(75, 92, 104, 0.14)',
+    position: 'relative',
+    backgroundColor: '#E4ECF0',
   },
   heroBanner: {
     width: '100%',
     height: '100%',
   },
-
-  /* 权限卡片 */
-  permissionCardWrapper: {
-    borderRadius: 28,
-    backgroundColor: 'transparent',
-    ...shadows.glassMd,
-  },
-  permissionCard: {
-    alignItems: 'center',
-    paddingTop: 28,
-    paddingBottom: 24,
-    paddingHorizontal: 22,
-  },
-  cardContent: {
-    width: '100%',
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  permissionIconWrapper: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    position: 'relative',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    ...shadows.glassSm,
-  },
-  iconGlowBg: {
+  viewfinderOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(110, 142, 167, 0.16)',
+    padding: 10,
   },
-  kicker: {
+  cornerTL: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    width: 12,
+    height: 12,
+    borderTopWidth: 2,
+    borderLeftWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 2,
+  },
+  cornerTR: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 12,
+    height: 12,
+    borderTopWidth: 2,
+    borderRightWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 2,
+  },
+  cornerBL: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    width: 12,
+    height: 12,
+    borderBottomWidth: 2,
+    borderLeftWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 2,
+  },
+  cornerBR: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    width: 12,
+    height: 12,
+    borderBottomWidth: 2,
+    borderRightWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 2,
+  },
+  lensPill: {
+    position: 'absolute',
+    top: 10,
+    left: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 9,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(15, 22, 28, 0.55)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  lensPillDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#3ECF8E',
+  },
+  lensPillText: {
+    color: '#FFFFFF',
+    fontSize: 10.5,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+
+  /* 底部操作区 */
+  heroActionArea: {
+    paddingTop: 16,
+    paddingBottom: 6,
+    paddingHorizontal: 8,
+  },
+  heroHeadlineBlock: {
+    alignItems: 'center',
+  },
+  heroKicker: {
     color: colors.primary,
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '700',
-    letterSpacing: 1.2,
-    textAlign: 'center',
+    letterSpacing: 1.4,
     textTransform: 'uppercase',
-    minHeight: 16,
   },
-  permissionTitle: {
+  heroTitle: {
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: 24,
-    marginTop: 6,
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: '600',
     textAlign: 'center',
-    minHeight: 34,
-    lineHeight: 32,
+    marginTop: 6,
   },
-  dramaHighlight: {
-    color: colors.primary, // 04 MIST BLUE BUTTER 雾蓝主题色
-    fontFamily: fonts.display,
+  heroTitleHighlight: {
+    color: colors.primary,
     fontWeight: '700',
   },
-  permissionBody: {
+  heroSubtitle: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 20,
-    marginTop: 8,
-    marginBottom: 8,
-    maxWidth: 280,
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 4,
     textAlign: 'center',
   },
-  buttonContainer: {
+  heroButtonWrapper: {
     width: '100%',
-    marginTop: 18,
-  },
-  later: {
-    color: colors.muted,
-    fontSize: 11.5,
-    textAlign: 'center',
-    marginTop: 14,
-    opacity: 0.75,
+    marginTop: 16,
   },
 
-  /* 特性卡片 */
+  /* 三大特性卡片 */
   featureRow: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 20,
+    marginTop: 18,
   },
   featureItemWrapper: {
     flex: 1,
@@ -417,40 +364,42 @@ const styles = StyleSheet.create({
     ...shadows.glassSm,
   },
   featureItem: {
-    // Fill the stretched row height so the border follows the outer bottom edge.
     flexGrow: 1,
     padding: 13,
-    paddingTop: 15,
-    minHeight: 122,
+    paddingTop: 14,
+    minHeight: 118,
   },
   featureIconBg: {
     width: 38,
     height: 38,
-    borderRadius: 14,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: 'rgba(255, 255, 255, 0.8)',
   },
   featureTitle: {
     color: colors.ink,
     fontSize: 13,
     fontWeight: '700',
-    marginTop: 11,
+    marginTop: 10,
   },
   featureBody: {
     color: colors.muted,
     fontSize: 10.5,
     lineHeight: 15,
-    marginTop: 4,
+    marginTop: 3,
   },
 
-  /* ── 时尚大片展区 (简洁原生设计) ── */
+  /* 今日灵感展区 */
   editorialSection: {
     marginTop: 26,
     marginHorizontal: -20,
   },
   sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     marginBottom: 12,
   },
@@ -460,6 +409,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.2,
   },
+  sectionSubtitle: {
+    color: colors.subtle,
+    fontSize: 11.5,
+    fontWeight: '500',
+  },
   editorialScroll: {
     paddingHorizontal: 20,
     paddingBottom: 6,
@@ -467,7 +421,7 @@ const styles = StyleSheet.create({
   },
   editorialCardWrapper: {
     width: 270,
-    height: 360, // 完美的 3:4 比例，与原始照片 768x1024 严丝合缝，完整展现大片
+    height: 360,
     borderRadius: 22,
     ...shadows.glassMd,
   },
@@ -504,13 +458,13 @@ const styles = StyleSheet.create({
   },
   tagGlassBg: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    backgroundColor: 'rgba(255, 255, 255, 0.76)',
   },
   tagBorder: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.92)',
+    borderColor: 'rgba(255, 255, 255, 0.95)',
   },
   tagTitleText: {
     color: colors.ink,

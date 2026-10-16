@@ -54,12 +54,12 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <PageHeader title="我的相册" icon="options-outline" />
 
-      {/* ── Apple 雾态统计大卡片 (Mist Blue Butter 调色) ── */}
+      {/* ── 极简小清新光影统计卡片 ── */}
       <View style={styles.statsCardWrapper}>
         <View style={styles.statsCard}>
           {/* 毛玻璃底层 */}
           <BlurView
-            intensity={55}
+            intensity={45}
             tint="light"
             style={[
               StyleSheet.absoluteFill,
@@ -67,12 +67,12 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
             ]}
           />
 
-          {/* 雾蓝黄油微渐变 */}
+          {/* 清新晨露微光渐变 */}
           <LinearGradient
             colors={[
-              'rgba(126, 155, 178, 0.90)',
-              'rgba(184, 201, 214, 0.85)',
-              'rgba(243, 223, 181, 0.82)',
+              'rgba(255, 255, 255, 0.92)',
+              'rgba(240, 247, 245, 0.88)',
+              'rgba(255, 255, 255, 0.95)',
             ]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -81,7 +81,7 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
 
           {/* 玻璃顶端微反光 */}
           <LinearGradient
-            colors={['rgba(255, 255, 255, 0.55)', 'rgba(255, 255, 255, 0.0)']}
+            colors={['rgba(255, 255, 255, 0.80)', 'rgba(255, 255, 255, 0.0)']}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 0.6 }}
             style={[StyleSheet.absoluteFill, styles.sheen]}
@@ -96,29 +96,24 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
             <View>
               <Text style={styles.count}>{filteredImages.length}</Text>
               <Text style={styles.suffix}>
-                {selectedFilter === '收藏' ? '张收藏影像' : '张珍藏影像'}
+                {selectedFilter === '收藏' ? '张收藏光影' : '张珍藏影像'}
               </Text>
             </View>
 
             <View style={styles.statsRight}>
-              {/* Apple 玻璃微徽章 */}
+              {/* 清新薄荷微徽章 */}
               <View style={styles.statsBadge}>
-                <BlurView
-                  intensity={40}
-                  tint="light"
-                  style={[StyleSheet.absoluteFill, { borderRadius: 14 }]}
-                />
                 <View style={[StyleSheet.absoluteFill, styles.badgeBg]} />
                 <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.badgeBorder]} />
-                <Ionicons name="time-outline" size={13} color={colors.whiteWarm} />
-                <Text style={styles.date}>最近更新 · 今天</Text>
+                <Ionicons name="sparkles-outline" size={13} color={colors.primary} />
+                <Text style={styles.date}>今日胶卷已就绪</Text>
               </View>
             </View>
           </View>
         </View>
       </View>
 
-      {/* ── Apple 雾态胶囊筛选栏 ── */}
+      {/* ── 小清新柔态胶囊筛选栏 ── */}
       <View style={styles.filterRow}>
         {filters.map((item) => {
           const active = selectedFilter === item;
@@ -133,7 +128,7 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
             >
               <View style={styles.filterPill}>
                 <BlurView
-                  intensity={active ? 60 : 40}
+                  intensity={active ? 50 : 35}
                   tint="light"
                   style={[
                     StyleSheet.absoluteFill,
@@ -154,8 +149,8 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
                       borderRadius: 18,
                       borderWidth: 1.1,
                       borderColor: active
-                        ? 'rgba(255, 255, 255, 0.95)'
-                        : 'rgba(255, 255, 255, 0.7)',
+                        ? 'rgba(45, 117, 101, 0.25)'
+                        : 'rgba(255, 255, 255, 0.85)',
                     },
                   ]}
                 />
@@ -333,13 +328,13 @@ const styles = StyleSheet.create({
   statsCardWrapper: {
     marginTop: 22,
     borderRadius: 26,
-    ...shadows.glassPrimaryGlow,
+    ...shadows.glassSm,
   },
   statsCard: {
     borderRadius: 26,
     overflow: 'hidden',
     position: 'relative',
-    paddingVertical: 24,
+    paddingVertical: 22,
     paddingHorizontal: 22,
   },
   cardBlur: {
@@ -350,8 +345,8 @@ const styles = StyleSheet.create({
   },
   statsBorder: {
     borderRadius: 26,
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 255, 255, 0.88)',
+    borderWidth: 1.1,
+    borderColor: 'rgba(255, 255, 255, 0.95)',
   },
   statsContent: {
     flexDirection: 'row',
@@ -360,16 +355,16 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   count: {
-    color: colors.whiteWarm,
+    color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: 44,
-    lineHeight: 48,
-    fontWeight: '600',
+    fontSize: 40,
+    lineHeight: 44,
+    fontWeight: '700',
   },
   suffix: {
-    color: 'rgba(254, 253, 251, 0.88)',
+    color: colors.muted,
     fontSize: 13,
-    marginTop: 3,
+    marginTop: 4,
     fontWeight: '500',
   },
   statsRight: {
@@ -378,25 +373,25 @@ const styles = StyleSheet.create({
   statsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
     borderRadius: 14,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     overflow: 'hidden',
     position: 'relative',
   },
   badgeBg: {
     borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.22)',
+    backgroundColor: 'rgba(45, 117, 101, 0.10)',
   },
   badgeBorder: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.65)',
+    borderColor: 'rgba(45, 117, 101, 0.20)',
   },
   date: {
-    color: colors.whiteWarm,
-    fontSize: 11,
+    color: colors.primary,
+    fontSize: 11.5,
     fontWeight: '600',
   },
 
@@ -425,11 +420,11 @@ const styles = StyleSheet.create({
   },
   pillActiveBg: {
     borderRadius: 18,
-    backgroundColor: 'rgba(126, 155, 178, 0.25)',
+    backgroundColor: 'rgba(45, 117, 101, 0.12)',
   },
   pillInactiveBg: {
     borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.62)',
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
   },
   filterText: {
     color: colors.muted,
@@ -438,7 +433,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   filterTextActive: {
-    color: colors.ink,
+    color: colors.primary,
     fontWeight: '700',
   },
 

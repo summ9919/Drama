@@ -41,7 +41,7 @@ export function ProfilePage() {
           {/* 头像 */}
           <View style={styles.avatarWrapper}>
             <LinearGradient
-              colors={[colors.primary, colors.mistBlue]}
+              colors={['#3B8E7B', '#2D7565']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.avatar}
@@ -53,10 +53,10 @@ export function ProfilePage() {
 
           <View style={styles.info}>
             <Text style={styles.name}>摄影练习生</Text>
-            <Text style={styles.desc}>用镜头记录生活的温暖</Text>
+            <Text style={styles.desc}>用镜头记录生活的呼吸感</Text>
           </View>
 
-          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+          <Ionicons name="chevron-forward" size={18} color={colors.subtle} />
         </View>
       </CardSurface>
 
@@ -65,20 +65,23 @@ export function ProfilePage() {
         <Tile
           icon="color-palette-outline"
           title="我的风格"
-          value="4种风格"
-          accent="rgba(184, 201, 214, 0.32)"
+          value="4种清新预设"
+          accent="rgba(45, 117, 101, 0.12)"
+          iconColor={colors.primary}
         />
         <Tile
           icon="camera-outline"
           title="相机设置"
-          value="专业参数"
-          accent="rgba(243, 223, 181, 0.48)"
+          value="AI构图辅助"
+          accent="rgba(143, 174, 197, 0.20)"
+          iconColor="#467694"
         />
         <Tile
           icon="book-outline"
           title="使用指南"
-          value="入门到进阶"
-          accent="rgba(102, 113, 123, 0.16)"
+          value="光线与焦段"
+          accent="rgba(245, 222, 179, 0.35)"
+          iconColor="#8A6E35"
         />
       </View>
 
@@ -121,7 +124,7 @@ export function ProfilePage() {
                   </View>
                   <Text style={styles.listText}>{item.title}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={17} color={colors.muted} />
+                <Ionicons name="chevron-forward" size={17} color={colors.subtle} />
               </Pressable>
             )
           )}
@@ -138,11 +141,13 @@ function Tile({
   title,
   value,
   accent,
+  iconColor,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   value: string;
   accent: string;
+  iconColor?: string;
 }) {
   return (
     <CardSurface
@@ -153,7 +158,7 @@ function Tile({
       contentStyle={styles.tile}
     >
       <View style={[styles.tileIconBg, { backgroundColor: accent }]}>
-        <Ionicons name={icon} size={20} color={colors.ink} />
+        <Ionicons name={icon} size={20} color={iconColor ?? colors.ink} />
       </View>
       <Text style={styles.tileTitle}>{title}</Text>
       <Text style={styles.tileValue}>{value}</Text>
@@ -277,12 +282,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   listRow: {
-    minHeight: 54,
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderColor: 'rgba(220, 229, 236, 0.55)',
+    borderColor: 'rgba(21, 29, 36, 0.05)',
   },
   listRowLast: {
     borderBottomWidth: 0,
@@ -299,8 +304,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    backgroundColor: 'rgba(126, 155, 178, 0.14)',
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: 'rgba(45, 117, 101, 0.08)',
   },
   listText: {
     color: colors.ink,

@@ -16,7 +16,19 @@ export function PageHeader({ title, icon = 'sparkles-outline', onPress }: Props)
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { color: colors.ink, fontFamily: fonts.display, fontSize: 34, marginTop: 3 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+    minHeight: 48,
+  },
+  title: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: 28,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
   spacer: { width: 42, height: 42 },
 });
