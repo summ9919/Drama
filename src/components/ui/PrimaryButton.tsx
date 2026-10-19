@@ -13,6 +13,7 @@ import {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { BrandIcon } from './BrandIcon';
 import { colors, shadows } from '../../constants/theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'glass' | 'almond' | 'butter' | 'dark';
@@ -48,11 +49,11 @@ export function PrimaryButton({
   const isDark = variant === 'dark';
   const isGlass = variant === 'glass';
 
-  // 清新晴空霁蓝质感渐变 (#3778A2 -> #2D6A94)
+  // 温暖炭黑质感渐变 (#34302B -> #181612)
   const primaryGradients: [string, string, string] = [
-    'rgba(55, 120, 162, 0.96)',
-    'rgba(45, 106, 148, 0.96)',
-    'rgba(35, 88, 126, 0.98)',
+    'rgba(52, 48, 43, 0.98)',
+    'rgba(45, 42, 38, 0.98)',
+    'rgba(24, 22, 18, 1)',
   ];
 
   // ── 从左往右发光扫光动画 ──
@@ -154,7 +155,7 @@ export function PrimaryButton({
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: pressed ? 'rgba(45, 106, 148, 0.16)' : 'rgba(45, 106, 148, 0.08)' },
+                { backgroundColor: pressed ? 'rgba(45, 42, 38, 0.10)' : 'rgba(45, 42, 38, 0.05)' },
               ]}
             />
           )}
@@ -163,8 +164,8 @@ export function PrimaryButton({
             <LinearGradient
               colors={
                 pressed
-                  ? ['rgba(40, 95, 135, 0.95)', 'rgba(30, 78, 112, 0.95)']
-                  : ['rgba(48, 112, 154, 0.92)', 'rgba(38, 92, 130, 0.92)']
+                  ? ['rgba(24, 22, 18, 0.98)', 'rgba(24, 22, 18, 0.98)']
+                  : ['rgba(45, 42, 38, 0.96)', 'rgba(24, 22, 18, 0.96)']
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 0.8, y: 1 }}
@@ -267,7 +268,9 @@ export function PrimaryButton({
               />
             ) : (
               <>
-                {icon && (
+                {icon && (icon === 'camera-outline' || icon === 'camera' ? (
+                  <BrandIcon size={compact ? 20 : 24} />
+                ) : (
                   <Ionicons
                     name={icon}
                     size={compact ? 16 : 18}
@@ -278,7 +281,7 @@ export function PrimaryButton({
                     }
                     style={styles.icon}
                   />
-                )}
+                ))}
                 <Text
                   style={[
                     styles.text,

@@ -1,16 +1,15 @@
-# 品牌 Logo
+# 小马品牌图标
 
-当前使用：[`assets/logo.png`](../assets/logo.png)，2172 × 724 像素，横版比例 3:1。
+当前品牌源文件是 `assets/pony-icon.svg`，背景为纯色 `#e5ce4d`。
+造型为瘦脸、歪嘴露齿笑的中性全身小马，脖后无鬃毛，马蹄采用同色直筒圆头轮廓。
 
-基于用户提供的高清横版修改，保留蓝灰、奶油金、D 字母光圈和“Drama相机”字标，调整左侧图标比例。使用内置 imagegen 生成，保留生成文件原始尺寸，浅色不透明背景。
+运行 `npm run brand:generate` 从 SVG 生成全部 PNG：
 
-README 仅指定显示宽度，应用使用 `aspectRatio: 2172 / 724` 和 `resizeMode="contain"` 等比显示。不要独立设置不匹配的宽高，也不要使用 `stretch`。
+- `icon.png`、`logo.png`：1024 × 1024，不透明的完整图标。
+- `logo_icon.png`：256 × 256，供应用内共用的 BrandIcon 组件使用。
+- `favicon.png`：64 × 64，供 Web 使用。
+- `adaptive-icon.png`：1024 × 1024，透明前景及安全边距；Android 背景由 app.json 设置为 #e5ce4d。
+- `icon-hd-v2.png`、`icon-hd-original-ratio.png`、`logo-hd-v2.png`：2048 × 2048，与当前品牌同步的高清版本。
 
-历史界面截图展示的是截图时的版本；当前品牌素材以此文件为准。
-
-## 最终生成提示词
-
-```text
-Edit the provided horizontal Drama camera logo. The user asks for this specific image as the base and insists that the icon must NOT look flattened or stretched.
-Make only the necessary proportional correction to the LEFT icon: its outer rounded-square face must be precisely square, equal height and width, straight-on front view. In the reference it is slightly too wide: correct the natural proportions while keeping the distinctive blue-gray draped folds, champagne-gold D with camera shutter aperture, and tiny gold dot. All corners remain fully visible. Preserve the right-hand exact text "Drama相机", its bold dark slate filled type, spacing, approximate size, baseline, and position as closely as possible. Preserve the opaque warm off-white background and 3:1 horizontal canvas, full composition with generous safe margins. Increase the icon height slightly if needed to make it square, rather than flattening or stretching the whole image. No change of design, no new text, no transparency, no cropping. High resolution master, crisp clean contours, no colored fringes, clean shading. Target native resolution 3072x1024 if available.
-```
+页面页头、取景器页头、相机导航、相机入口和旧 RainbowBrand 均使用同一个小马品牌图标。
+其他文档中的旧版图像生成提示词仅作设计历史记录。

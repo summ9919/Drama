@@ -7,14 +7,14 @@ import {
   View,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadows } from '../../constants/theme';
+import { BrandIcon } from '../ui/BrandIcon';
 
 const labels: Record<string, string> = {
-  camera: '相机',
+  camera: 'AI 相机',
   inspiration: '灵感',
   album: '相册',
   profile: '我的',
@@ -36,32 +36,15 @@ const iconsFilled: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottomPadding = Platform.OS === 'web' ? 16 : Math.max(insets.bottom, 12);
+  const bottomPadding = Platform.OS === 'web' ? 12 : Math.max(insets.bottom, 10);
 
   return (
     <View pointerEvents="box-none" style={[styles.wrapper, { paddingBottom: bottomPadding }]}>
-      {/* 居中透明底栏容器 */}
-      <View style={styles.dockCapsule} pointerEvents="auto">
-        {/* 背景高通透毛玻璃底层 */}
-        <View style={[StyleSheet.absoluteFill, styles.dockBgContainer]} pointerEvents="none">
-          <BlurView
-            intensity={50}
-            tint="light"
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={[StyleSheet.absoluteFill, styles.dockGlassBg]} />
-          {/* 顶端柔和通透反光 */}
-          <LinearGradient
-            colors={['rgba(255, 255, 255, 0.65)', 'rgba(255, 255, 255, 0.0)']}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 0.7 }}
-            style={StyleSheet.absoluteFill}
-          />
-          {/* 纤细光泽描边 */}
-          <View style={[StyleSheet.absoluteFill, styles.dockBorder]} />
-        </View>
+      <View style={styles.dock} pointerEvents="auto">
+        <BlurView intensity={55} tint="light" style={StyleSheet.absoluteFill} />
+        <View style={[StyleSheet.absoluteFill, styles.dockTint]} />
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dockBorder]} />
 
-        {/* 切换 Tab 列表 */}
         <View style={styles.tabsRow}>
           {state.routes.map((route, index) => {
             const focused = state.index === index;
@@ -81,39 +64,26 @@ export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps)
                 key={route.key}
                 style={({ pressed }) => [
                   styles.tabItem,
-                  focused && styles.tabItemActive,
-                  {
-                    transform: [{ scale: pressed ? 0.94 : 1 }],
-                  },
+                  { transform: [{ scale: pressed ? 0.94 : 1 }] },
                 ]}
                 onPress={onPress}
                 accessibilityRole="tab"
                 accessibilityState={focused ? { selected: true } : {}}
                 accessibilityLabel={descriptors[route.key].options.tabBarAccessibilityLabel}
               >
-                {/* 选中项：清新薄荷柔光胶囊 */}
-                {focused && (
-                  <View style={StyleSheet.absoluteFill} pointerEvents="none">
-                    <View style={[StyleSheet.absoluteFill, styles.activePillBg]} />
-                    <View style={[StyleSheet.absoluteFill, styles.activePillBorder]} />
-                  </View>
-                )}
-
-                <Ionicons
-                  name={
-                    focused
-                      ? iconsFilled[route.name] ?? 'ellipse'
-                      : icons[route.name] ?? 'ellipse-outline'
-                  }
-                  size={17}
-                  color={focused ? colors.primary : '#7E8F9B'}
-                />
-                <Text
-                  style={[
-                    styles.tabLabel,
-                    focused && styles.tabLabelActive,
-                  ]}
-                >
+                <View style={styles.iconWrap}>
+                  {route.name === 'camera' ? <BrandIcon size={26} /> : <Ionicons
+                    name={
+                      focused
+                        ? iconsFilled[route.name] ?? 'ellipse'
+                        : icons[route.name] ?? 'ellipse-outline'
+                    }
+                    size={23}
+                    color={focused ? colors.primary : colors.onSurfaceVariant}
+                  />}
+                  {focused && <View style={styles.activeDot} />}
+                </View>
+                <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
                   {labels[route.name] ?? route.name}
                 </Text>
               </Pressable>
@@ -137,64 +107,61 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     zIndex: 9999,
   },
-  dockCapsule: {
-    borderRadius: 9999,
-    position: 'relative',
-    padding: 5,
-    pointerEvents: 'auto' as any,
-    ...shadows.glassMd,
-  },
-  dockBgContainer: {
-    borderRadius: 9999,
+  dock: {
+    width: '100%',
+    maxWidth: 448,
+    borderRadius: 18,
     overflow: 'hidden',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    ...shadows.glassLg,
   },
-  dockGlassBg: {
-    borderRadius: 9999,
-    backgroundColor: 'rgba(255, 255, 255, 0.82)',
+  dockTint: {
+    borderRadius: 18,
+    backgroundColor: 'rgba(251, 249, 246, 0.88)',
   },
   dockBorder: {
-    borderRadius: 9999,
-    borderWidth: 1.1,
-    borderColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
   },
   tabsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'space-around',
+    height: 60,
     zIndex: 2,
   },
   tabItem: {
-    flexDirection: 'row',
+    flex: 1,
+    minWidth: 56,
+    minHeight: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 38,
-    paddingHorizontal: 14,
-    borderRadius: 9999,
-    gap: 5,
-    position: 'relative',
+    gap: 2,
   },
-  tabItemActive: {
-    zIndex: 10,
+  iconWrap: {
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  activePillBg: {
-    borderRadius: 9999,
-    backgroundColor: 'rgba(45, 106, 148, 0.12)',
-  },
-  activePillBorder: {
-    borderRadius: 9999,
-    borderWidth: 1,
-    borderColor: 'rgba(45, 106, 148, 0.22)',
+  activeDot: {
+    position: 'absolute',
+    bottom: -3,
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: colors.secondaryFixedDim,
   },
   tabLabel: {
-    color: '#7E8F9B',
-    fontSize: 12.5,
+    color: colors.onSurfaceVariant,
+    fontSize: 11,
+    lineHeight: 14,
     fontWeight: '500',
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
   },
   tabLabelActive: {
     color: colors.primary,
-    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 0.3,
   },
 });

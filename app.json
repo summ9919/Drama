@@ -21,10 +21,10 @@
     },
     "android": {
       "package": "com.warmlens.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F4F7F9"
+        "backgroundColor": "#e5ce4d"
       },
       "permissions": [
         "CAMERA",

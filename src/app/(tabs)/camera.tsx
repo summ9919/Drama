@@ -1,9 +1,6 @@
-import React, { useRef } from 'react';
-import { Alert, Modal } from 'react-native';
-import { CameraView } from 'expo-camera';
+import React, { useState } from 'react';
+import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { CameraCapture } from '../../components/business/CameraCapture';
 import { CameraHome } from '../../components/business/CameraHome';
 import { PhotoReview } from '../../components/business/PhotoReview';
 import { Screen } from '../../components/ui/Screen';
@@ -14,21 +11,21 @@ import { useCaptureStore } from '../../store/captureStore';
 export default function CameraRoute() {
   const router = useRouter();
   const camera = useCameraFlow();
-  const cameraRef = useRef<CameraView>(null);
   const capturedUri = useCaptureStore((state) => state.capturedUri);
   const setCapturedUri = useCaptureStore((state) => state.setCapturedUri);
-  const addSavedUri = useCaptureStore((state) => state.addSavedUri);
   const clearCapturedUri = useCaptureStore((state) => state.clearCapturedUri);
-  const [saving, setSaving] = React.useState(false);
+  const addSavedUri = useCaptureStore((state) => state.addSavedUri);
+  const [saving, setSaving] = useState(false);
 
-  const takePhoto = (uri: string) => {
-    setCapturedUri(uri);
-    camera.close();
+  const openCamera = async () => {
+    const granted = await camera.open();
+    if (granted) router.push('/capture');
   };
 
   const retake = async () => {
     clearCapturedUri();
-    await camera.open();
+    const granted = await camera.open();
+    if (granted) router.push('/capture');
   };
 
   const save = async () => {
@@ -49,11 +46,13 @@ export default function CameraRoute() {
     }
   };
 
-  return <Screen>
-    {capturedUri ? <PhotoReview uri={capturedUri} onRetake={retake} onSave={save} saving={saving} /> : <CameraHome permissionGranted={camera.permissionGranted} onOpenCamera={camera.open} />}
-    <Modal visible={camera.visible} animationType="slide" statusBarTranslucent presentationStyle="fullScreen" onRequestClose={camera.close}>
-      {camera.visible && <SafeAreaProvider><CameraCapture cameraRef={cameraRef} onClose={camera.close} onCapture={takePhoto}
-        onConfigure={() => { camera.close(); router.push('/settings/ai'); }} /></SafeAreaProvider>}
-    </Modal>
-  </Screen>;
+  return (
+    <Screen>
+      {capturedUri ? (
+        <PhotoReview uri={capturedUri} onRetake={retake} onSave={save} saving={saving} />
+      ) : (
+        <CameraHome permissionGranted={camera.permissionGranted} onOpenCamera={openCamera} />
+      )}
+    </Screen>
+  );
 }

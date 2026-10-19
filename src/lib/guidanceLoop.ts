@@ -24,12 +24,14 @@ export class GuidanceLoop {
   private controller: AbortController | null = null;
   private timer?: ReturnType<typeof setTimeout>;
   private now: () => number;
-  private schedule: typeof setTimeout;
-  private unschedule: typeof clearTimeout;
+  private schedule: (handler: () => void, timeout?: number) => ReturnType<typeof setTimeout>;
+  private unschedule: (timer?: ReturnType<typeof setTimeout>) => void;
   constructor(private deps: Dependencies) {
     this.now = deps.now ?? Date.now;
-    this.schedule = deps.schedule ?? setTimeout;
-    this.unschedule = deps.unschedule ?? clearTimeout;
+    // Keep the globals unbound from the class instance: browsers throw
+    // "Illegal invocation" when setTimeout/clearTimeout run with another `this`.
+    this.schedule = deps.schedule ?? ((handler, timeout) => setTimeout(handler, timeout));
+    this.unschedule = deps.unschedule ?? ((timer) => clearTimeout(timer));
   }
   start() {
     if (this.enabled) return;

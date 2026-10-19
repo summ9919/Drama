@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Alert,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,12 +10,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, fonts, shadows } from '../../constants/theme';
-import { PageHeader } from '../ui/PageHeader';
-import { CardSurface } from '../ui/CardSurface';
 import { useRouter } from 'expo-router';
+import { colors, shadows } from '../../constants/theme';
+import { CAMERA_STYLES } from '../../constants/guidance';
+import { useCaptureStore } from '../../store/captureStore';
+import { PageHeader } from '../ui/PageHeader';
 
-const profileItems = [
+const utilities = [
   { title: 'AI 配置', icon: 'options-outline' },
   { title: '我的作品', icon: 'images-outline' },
   { title: '收藏的灵感', icon: 'heart-outline' },
@@ -25,318 +27,273 @@ const profileItems = [
 
 export function ProfilePage() {
   const router = useRouter();
+  const savedCount = useCaptureStore((state) => state.savedUris.length);
+  const favoriteCount = useCaptureStore((state) => state.favoriteUris.length);
+  const styleCount = Object.keys(CAMERA_STYLES).length;
+
+  const openUtility = (title: string) => {
+    if (title === 'AI 配置') {
+      router.push('/settings/ai');
+    } else if (title === '我的作品' || title === '收藏的灵感') {
+      router.navigate('/album');
+    } else {
+      Alert.alert(title, '这个入口会在下一版开放。');
+    }
+  };
+
   return (
     <View style={styles.screen}>
-      {/* ── 顶部固定导航栏 ── */}
       <View style={styles.fixedHeader}>
-        <PageHeader title="我的" icon="settings-outline" />
+        <PageHeader title="设置" icon="options-outline" />
       </View>
 
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* ── 个人信息卡片 (与首页卡片保持一致的 CardSurface) ── */}
-        <CardSurface
-        radius={26}
-        borderWidth={1.2}
-        borderColor="rgba(255, 255, 255, 0.58)"
-        style={styles.profileCardWrapper}
-        contentStyle={styles.profileCard}
-      >
-        <View style={styles.profileContent}>
-          {/* 头像 */}
-          <View style={styles.avatarWrapper}>
-            <LinearGradient
-              colors={['#4685B0', '#2D6A94']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.avatar}
+        {/* ── Curator profile card ── */}
+        <View style={styles.heroCard}>
+          <LinearGradient
+            pointerEvents="none"
+            colors={['rgba(255, 224, 142, 0.34)', 'rgba(255, 224, 142, 0)']}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0.15, y: 1 }}
+            style={styles.heroGlow}
+          />
+
+          <View style={styles.heroTop}>
+            <View style={styles.avatarWrap}>
+              <Image
+                source={require('../../../assets/editorial/editorial_3.jpg')}
+                style={styles.avatar}
+              />
+            </View>
+
+            <View style={styles.heroInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name} numberOfLines={1}>林晨 (Chen Lin)</Text>
+              </View>
+              <Text style={styles.heroDesc} numberOfLines={1}>摄影创作者</Text>
+              <View style={styles.cloudRow}>
+                <Ionicons name="cloud-done-outline" size={13} color={colors.tertiary} />
+                <Text style={styles.cloudText}>DRAMA CLOUD</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statCell}>
+              <Text style={styles.statValue}>{savedCount}</Text>
+              <Text style={styles.statLabel}>已保存作品</Text>
+            </View>
+            <View style={styles.statCell}>
+              <Text style={[styles.statValue, styles.statValueGold]}>{favoriteCount}</Text>
+              <Text style={styles.statLabel}>我的收藏</Text>
+            </View>
+            <View style={styles.statCell}>
+              <Text style={styles.statValue}>{styleCount}</Text>
+              <Text style={styles.statLabel}>拍摄风格</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Utilities ── */}
+        <View style={styles.utilityCard}>
+          {utilities.map((item, index) => (
+            <Pressable
+              key={item.title}
+              accessibilityRole="button"
+              onPress={() => openUtility(item.title)}
+              style={({ pressed }) => [
+                styles.utilityRow,
+                index === utilities.length - 1 && styles.utilityRowLast,
+                pressed && styles.utilityRowPressed,
+              ]}
             >
-              <Text style={styles.avatarText}>D</Text>
-            </LinearGradient>
-            <View pointerEvents="none" style={styles.avatarBorder} />
-          </View>
-
-          <View style={styles.info}>
-            <Text style={styles.name}>摄影练习生</Text>
-            <Text style={styles.desc}>用镜头记录生活的呼吸感</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color={colors.subtle} />
+              <View style={styles.utilityLeft}>
+                <Ionicons
+                  name={item.icon}
+                  size={19}
+                  color={colors.onSurfaceVariant}
+                />
+                <Text style={styles.utilityText} numberOfLines={1}>{item.title}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={17} color={colors.onSurfaceVariant} />
+            </Pressable>
+          ))}
         </View>
-      </CardSurface>
 
-      {/* ── 功能方块 (与首页 FeatureCard 保持完全一致) ── */}
-      <View style={styles.tiles}>
-        <Tile
-          icon="color-palette-outline"
-          title="我的风格"
-          value="4种清新预设"
-          accent="rgba(45, 106, 148, 0.12)"
-          iconColor={colors.primary}
-        />
-        <Tile
-          icon="camera-outline"
-          title="相机设置"
-          value="AI构图辅助"
-          accent="rgba(143, 174, 197, 0.20)"
-          iconColor="#467694"
-        />
-        <Tile
-          icon="book-outline"
-          title="使用指南"
-          value="光线与焦段"
-          accent="rgba(245, 222, 179, 0.35)"
-          iconColor="#8A6E35"
-        />
-      </View>
-
-      {/* ── 列表组 ── */}
-      <CardSurface
-        radius={24}
-        borderWidth={1.2}
-        borderColor="rgba(255, 255, 255, 0.58)"
-        style={styles.listCardWrapper}
-        contentStyle={styles.listCard}
-      >
-        <View style={styles.listContent}>
-          {profileItems.map(
-            (item, index) => (
-              <Pressable
-                key={item.title}
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  styles.listRow,
-                  index === profileItems.length - 1 && styles.listRowLast,
-                  { opacity: pressed ? 0.7 : 1 },
-                ]}
-                onPress={() => {
-                  if (item.title === 'AI 配置') {
-                    router.push('/settings/ai');
-                  } else if (item.title === '我的作品' || item.title === '收藏的灵感') {
-                    router.navigate('/album');
-                  } else {
-                    Alert.alert(item.title, '这个入口会在下一版开放。');
-                  }
-                }}
-              >
-                <View style={styles.listLeft}>
-                  <View style={styles.listIconWrap}>
-                    <Ionicons
-                      name={item.icon}
-                      size={17}
-                      color={colors.primary}
-                    />
-                  </View>
-                  <Text style={styles.listText}>{item.title}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={17} color={colors.subtle} />
-              </Pressable>
-            )
-          )}
+        <View style={styles.buildFooter}>
+          <Text style={styles.buildText}>Drama相机 · MIT License · © 2026 Tommy_Cui</Text>
         </View>
-      </CardSurface>
-
-      <Text style={styles.quote}>“生活很普通，但值得好好拍。”</Text>
-    </ScrollView>
+      </ScrollView>
     </View>
-  );
-}
-
-function Tile({
-  icon,
-  title,
-  value,
-  accent,
-  iconColor,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  value: string;
-  accent: string;
-  iconColor?: string;
-}) {
-  return (
-    <CardSurface
-      radius={20}
-      borderWidth={1.1}
-      borderColor="rgba(255, 255, 255, 0.56)"
-      style={styles.tileWrapper}
-      contentStyle={styles.tile}
-    >
-      <View style={[styles.tileIconBg, { backgroundColor: accent }]}>
-        <Ionicons name={icon} size={20} color={iconColor ?? colors.ink} />
-      </View>
-      <Text style={styles.tileTitle}>{title}</Text>
-      <Text style={styles.tileValue}>{value}</Text>
-    </CardSurface>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    position: 'relative',
-    backgroundColor: colors.canvas,
+    backgroundColor: colors.surface,
   },
   fixedHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 6,
-    backgroundColor: colors.canvas,
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    paddingBottom: 4,
+    backgroundColor: 'rgba(251, 249, 246, 0.92)',
     zIndex: 100,
     borderBottomWidth: 1,
-    borderColor: 'rgba(21, 29, 36, 0.05)',
+    borderColor: 'rgba(45, 42, 38, 0.04)',
   },
   container: {
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 100,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 120,
+    gap: 20,
   },
 
-  /* 个人卡片 */
-  profileCardWrapper: {
-    marginTop: 12,
-    borderRadius: 26,
-    backgroundColor: 'transparent',
+  /* hero */
+  heroCard: {
+    backgroundColor: colors.surfaceLowest,
+    borderRadius: 28,
+    padding: 18,
+    overflow: 'hidden',
     ...shadows.glassMd,
   },
-  profileCard: {
-    padding: 18,
+  heroGlow: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '70%',
+    height: '80%',
   },
-  profileContent: {
+  heroTop: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
     zIndex: 2,
   },
-  avatarWrapper: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+  avatarWrap: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
     position: 'relative',
-    ...shadows.glassSm,
   },
   avatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 62,
+    height: 62,
+    borderRadius: 31,
   },
-  avatarBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 29,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.85)',
-  },
-  avatarText: {
-    color: colors.whiteWarm,
-    fontFamily: fonts.display,
-    fontSize: 26,
-  },
-  info: {
+  heroInfo: {
     flex: 1,
-    marginLeft: 14,
+    minWidth: 0,
+    gap: 2,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
   },
   name: {
-    color: colors.ink,
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.primary,
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '600',
+    letterSpacing: -0.1,
+    flexShrink: 1,
   },
-  desc: {
-    color: colors.muted,
-    fontSize: 11.5,
-    marginTop: 4,
+  heroDesc: {
+    color: colors.onSurfaceVariant,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '400',
   },
-
-  /* 功能方块 */
-  tiles: {
+  cloudRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 16,
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 1,
   },
-  tileWrapper: {
+  cloudText: {
+    color: colors.tertiary,
+    fontSize: 11,
+    fontWeight: '500',
+    letterSpacing: 0.9,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    marginTop: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    borderRadius: 16,
+    backgroundColor: colors.surfaceLow,
+    zIndex: 2,
+  },
+  statCell: {
     flex: 1,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
-    ...shadows.glassSm,
-  },
-  tile: {
-    flexGrow: 1,
-    padding: 13,
-    paddingTop: 15,
-    minHeight: 122,
-  },
-  tileIconBg: {
-    width: 38,
-    height: 38,
-    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    gap: 2,
   },
-  tileTitle: {
-    color: colors.ink,
-    fontSize: 13,
+  statValue: {
+    color: colors.primary,
+    fontSize: 20,
+    lineHeight: 26,
     fontWeight: '700',
-    marginTop: 11,
+    letterSpacing: -0.2,
   },
-  tileValue: {
-    color: colors.muted,
-    fontSize: 10.5,
-    lineHeight: 15,
-    marginTop: 4,
+  statValueGold: {
+    color: colors.secondary,
+  },
+  statLabel: {
+    color: colors.onSurfaceVariant,
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
 
-  /* 列表 */
-  listCardWrapper: {
+  /* utilities */
+  utilityCard: {
+    backgroundColor: colors.surfaceLowest,
     borderRadius: 24,
-    marginTop: 18,
-    backgroundColor: 'transparent',
+    overflow: 'hidden',
     ...shadows.glassSm,
   },
-  listCard: {
-    paddingHorizontal: 16,
-  },
-  listContent: {
-    width: '100%',
-  },
-  listRow: {
+  utilityRow: {
     minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderColor: 'rgba(21, 29, 36, 0.05)',
+    borderColor: 'rgba(45, 42, 38, 0.05)',
+    gap: 8,
   },
-  listRowLast: {
+  utilityRowLast: {
     borderBottomWidth: 0,
   },
-  listLeft: {
+  utilityRowPressed: {
+    backgroundColor: colors.surfaceLow,
+  },
+  utilityLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
+    flexShrink: 1,
   },
-  listIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.85)',
-    backgroundColor: 'rgba(45, 106, 148, 0.08)',
-  },
-  listText: {
-    color: colors.ink,
+  utilityText: {
+    color: colors.primary,
     fontSize: 13.5,
-    fontWeight: '500',
+    fontWeight: '400',
+    flexShrink: 1,
   },
-  quote: {
-    textAlign: 'center',
-    color: colors.muted,
-    fontFamily: fonts.display,
-    fontSize: 14.5,
-    marginTop: 28,
-    fontStyle: 'italic',
+  buildFooter: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  buildText: {
+    color: colors.onSurfaceVariant,
+    fontSize: 10,
+    fontWeight: '500',
+    opacity: 0.7,
+    letterSpacing: 0.5,
   },
 });

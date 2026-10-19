@@ -69,12 +69,14 @@ test('vision HTTP request includes shared schema and real image, then valid para
     const guide = { active: true, ready: true, enabled: true, autoZoom: true, context, result, target, status: { phase: 'ready', message: '已更新' } };
     const { CameraCapture } = loadModule('src/components/business/CameraCapture.tsx', {
       react: { default: React, useState: initial => [typeof initial === 'object' ? { width: 400, height: 866 } : initial, () => {}] },
-      'react-native': { View: 'View', Text: 'Text', Pressable: 'Button', ScrollView: 'ScrollView', ActivityIndicator: 'Spinner', StyleSheet: { create: x => x } },
+      'react-native': { View: 'View', Text: 'Text', Pressable: 'Button', ScrollView: 'ScrollView', Image: 'Image', ActivityIndicator: 'Spinner', StyleSheet: { create: x => x }, Platform: { OS: 'web', select: options => options?.default ?? options?.web } },
       'expo-camera': { CameraView: 'NativeCamera' },
+      'expo-linear-gradient': { LinearGradient: 'LinearGradient' },
       '@expo/vector-icons': { Ionicons: 'Icon' },
       'react-native-safe-area-context': { SafeAreaView: 'SafeArea', useSafeAreaInsets: () => ({ top: 24, bottom: 24 }) },
       'expo-status-bar': { StatusBar: 'StatusBar' },
-      '../../constants/theme': { colors: {} },
+      '../ui/BrandIcon': { BrandIcon: 'BrandIcon' },
+      '../../store/captureStore': { useCaptureStore: selector => selector({ savedUris: [] }) },
       '../../hooks/useCameraGuidance': { useCameraGuidance: () => guide },
       './CameraDirectionOverlay': { CameraDirectionOverlay: 'DirectionOverlay' },
       './CameraGuidanceControls': { CameraGuidanceControls: 'GuidanceControls' },
@@ -82,8 +84,9 @@ test('vision HTTP request includes shared schema and real image, then valid para
     });
     const visit = node => !React.isValidElement(node) ? [] : [node, ...React.Children.toArray(node.props.children).flatMap(visit)];
     const nodes = visit(CameraCapture({ cameraRef: { current: null } }));
-    assert.ok(nodes.some(node => (node.type === 'Text' && node.props.children === value.summary) || (node.type === 'ReadyNotice' && node.props.message === value.summary)), 'validated summary is actually rendered');
-    assert.ok(nodes.some(node => node.type === 'Text' && React.Children.toArray(node.props.children).join('') === `光线：${value.light}`));
+    const banner = nodes.find(node => node.type === 'ReadyNotice');
+    assert.ok(banner && typeof banner.props.message === 'string' && banner.props.message.includes(value.light), 'guidance banner renders the light advice');
+    if (value.state === 'uncertain') assert.ok(banner.props.message.includes(value.summary), 'uncertain summary is shown in the banner');
     assert.equal(nodes.find(node => node.type === 'DirectionOverlay').props.target, target);
     if (value.state === 'aim') { assert.equal(target.phase, 'aiming'); assert.match(message, /目标圈/); }
     if (value.state === 'adjust') { assert.equal(target, null); assert.match(message, /左/); }
@@ -190,7 +193,7 @@ test('slow HTTP responses survive 12 seconds; 45-second timeout and cancellation
 test('waiting, plan validation, updated latency and errors are visible in camera controls', () => {
   const { CameraGuidanceControls } = loadModule('src/components/business/CameraGuidanceControls.tsx', {
     react: { default: React },
-    'react-native': { View: 'View', Text: 'Text', Pressable: 'Button', ActivityIndicator: 'Spinner', StyleSheet: { create: x => x } },
+    'react-native': { View: 'View', Text: 'Text', Pressable: 'Button', ActivityIndicator: 'Spinner', StyleSheet: { create: x => x }, Platform: { OS: 'web', select: options => options?.default ?? options?.web } },
     '@expo/vector-icons': { Ionicons: 'Icon' },
   });
   const visit = node => !React.isValidElement(node) ? [] : [node, ...React.Children.toArray(node.props.children).flatMap(visit)];

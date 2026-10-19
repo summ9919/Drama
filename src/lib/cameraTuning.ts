@@ -1,5 +1,6 @@
 import { requireOptionalNativeModule } from 'expo-modules-core';
-import type { CameraCapabilities, Guidance } from '../types/guidance';
+import type { CameraCapabilities, CameraStyle, Guidance } from '../types/guidance';
+import { CAMERA_STYLE_PRESETS } from '../constants/guidance';
 
 type TuningModule = {
   capabilities(facing: string): Promise<CameraCapabilities>;
@@ -29,6 +30,16 @@ export function validateCameraTuning(camera: Guidance['camera'], capabilities: C
 }
 export function needsCameraTuning(camera: Guidance['camera']) {
   return camera.aperture !== null || camera.contrast !== null || camera.whiteBalance !== 'keep';
+}
+export function styleTuning(style: CameraStyle, capabilities: CameraCapabilities): Guidance['camera'] | null {
+  const preset = CAMERA_STYLE_PRESETS[style];
+  if (!capabilities.native) return null;
+  const whiteBalance = capabilities.whiteBalance.includes(preset.whiteBalance)
+    ? preset.whiteBalance
+    : capabilities.whiteBalance.includes('auto') ? 'auto' : 'keep';
+  const contrast = capabilities.contrast ? preset.contrast : null;
+  if (whiteBalance === 'keep' && contrast === null) return null;
+  return { zoomFactor: null, flash: 'keep', aperture: null, contrast, whiteBalance };
 }
 export async function applyCameraTuning(facing: string, camera: Guidance['camera'], capabilities: CameraCapabilities) {
   validateCameraTuning(camera, capabilities);

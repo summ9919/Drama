@@ -13,8 +13,10 @@ import type { CompositionTarget } from '../lib/compositionTarget';
 import { digitalZoomFactor } from '../lib/cameraGeometry';
 import { GUIDANCE_SETTLE_MS } from '../constants/guidance';
 import { SYSTEM_CAMERA_CAPABILITIES } from '../constants/cameraCapabilities';
-import { applyCameraTuning, needsCameraTuning, readCameraCapabilities, resetCameraTuning, validateCameraTuning } from '../lib/cameraTuning';
-import type { CameraMode, CameraStyle, GuidanceConfig, GuidanceContext, GuidanceResult, GuidanceStatus } from '../types/guidance';
+import { applyCameraTuning, needsCameraTuning, readCameraCapabilities, resetCameraTuning, styleTuning, validateCameraTuning } from '../lib/cameraTuning';
+import type { CameraCapabilities, CameraMode, CameraStyle, GuidanceConfig, GuidanceContext, GuidanceResult, GuidanceStatus, WhiteBalance } from '../types/guidance';
+
+type AppliedTuning = { whiteBalance: WhiteBalance | 'keep'; contrast: number | null };
 
 export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapture: (uri: string) => void) {
   const [context, setContext] = useState<GuidanceContext>({ style: '清透', mode: '人像', facing: 'back', zoom: 0, flash: 'off' });
@@ -53,11 +55,16 @@ export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapt
   const zoomTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loop = useRef<GuidanceLoop | null>(null);
   const tuningRevision = useRef(0);
+  const styleRevision = useRef(0);
   const tuningBusy = useRef(false);
   const [tuningMessage, setTuningMessage] = useState('系统自动色彩');
+  const [appliedTuning, setAppliedTuning] = useState<AppliedTuning | null>(null);
 
   function resetStep() {
-    if (tuningBusy.current) void resetCameraTuning(contextRef.current.facing).catch(() => undefined);
+    if (tuningBusy.current) {
+      void resetCameraTuning(contextRef.current.facing).catch(() => undefined);
+      if (mounted.current) setAppliedTuning(null);
+    }
     tuningRevision.current++;
     tuningBusy.current = false;
     if (stepTimer.current !== null) clearTimeout(stepTimer.current);
@@ -91,6 +98,42 @@ export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapt
   function commitContext(next: GuidanceContext) {
     contextRef.current = next; setContext(next);
     executor.current.observeCamera(next, Date.now()); syncExecution();
+  }
+  function applyStylePreset(style: CameraStyle, facing: 'front' | 'back', capabilities?: CameraCapabilities) {
+    const revision = ++styleRevision.current;
+    void (async () => {
+      try {
+        const readCaps = capabilities ? Promise.resolve(capabilities) : (async () => {
+          try {
+            return await readCameraCapabilities(facing);
+          } catch {
+            // onCameraReady can fire a frame before the native view is visible.
+            await new Promise<void>(resolve => setTimeout(resolve, 250));
+            return readCameraCapabilities(facing);
+          }
+        })();
+        const caps = await readCaps;
+        if (!mounted.current || revision !== styleRevision.current) return;
+        const tuning = styleTuning(style, caps);
+        if (!tuning) {
+          if (mounted.current && !enabledRef.current) {
+            setTuningMessage(caps.native
+              ? `当前镜头不支持「${style}」滤镜参数`
+              : '当前安装包未包含相机参数模块，请使用含 camera-tuning 的构建');
+          }
+          return;
+        }
+        await applyCameraTuning(facing, tuning, caps);
+        if (!mounted.current || revision !== styleRevision.current) return;
+        setAppliedTuning({ whiteBalance: tuning.whiteBalance, contrast: tuning.contrast });
+        if (!enabledRef.current) {
+          const wb = { auto: '自动', daylight: '日光', cloudy: '阴天', tungsten: '钨丝灯', fluorescent: '荧光灯', keep: '系统' };
+          setTuningMessage(`滤镜「${style}」· 白平衡 ${wb[tuning.whiteBalance]} · 对比度 ${tuning.contrast?.toFixed(2) ?? '系统'}`);
+        }
+      } catch {
+        if (mounted.current && revision === styleRevision.current && !enabledRef.current) setTuningMessage(`「${style}」滤镜参数设置失败`);
+      }
+    })();
   }
   function finishSwitch() {
     if (switchTimer.current !== null) clearTimeout(switchTimer.current);
@@ -142,6 +185,7 @@ export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapt
         try {
           // Remove the previous plan's overrides before taking a new baseline photo.
           await resetCameraTuning(contextRef.current.facing);
+          if (mounted.current) setAppliedTuning(null);
           const capabilities = await readCameraCapabilities(contextRef.current.facing);
           if (signal.aborted) throw new Error('取样已取消');
           commitContext({ ...contextRef.current, capabilities });
@@ -161,17 +205,25 @@ export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapt
         const capabilities = contextRef.current.capabilities ?? SYSTEM_CAMERA_CAPABILITIES;
         validateCameraTuning(next.advice.camera, capabilities);
         const commands = executor.current.load(next, contextRef.current, Date.now(), autoRef.current);
-        if (needsCameraTuning(next.advice.camera)) {
+        // Keep the selected filter look unless the model explicitly overrides it.
+        const styleCamera = styleTuning(contextRef.current.style, capabilities);
+        const hardwareCamera = styleCamera ? {
+          ...next.advice.camera,
+          whiteBalance: next.advice.camera.whiteBalance === 'keep' ? styleCamera.whiteBalance : next.advice.camera.whiteBalance,
+          contrast: next.advice.camera.contrast ?? styleCamera.contrast,
+        } : next.advice.camera;
+        if (needsCameraTuning(hardwareCamera)) {
           executor.current.setHardwareDone(false, Date.now());
           tuningBusy.current = true;
           const revision = ++tuningRevision.current;
           const facing = contextRef.current.facing;
           setTuningMessage('正在设置相机参数…');
-          void applyCameraTuning(facing, next.advice.camera, capabilities).then(() => {
+          void applyCameraTuning(facing, hardwareCamera, capabilities).then(() => {
             if (!mounted.current || revision !== tuningRevision.current || !enabledRef.current) return;
             tuningBusy.current = false;
             executor.current.setHardwareDone(true, Date.now());
-            const settings = next.advice.camera;
+            setAppliedTuning({ whiteBalance: hardwareCamera.whiteBalance, contrast: hardwareCamera.contrast });
+            const settings = hardwareCamera;
             const wb = { keep: '系统', auto: '自动', daylight: '日光', cloudy: '阴天', tungsten: '钨丝灯', fluorescent: '荧光灯' };
             setTuningMessage([settings.aperture === null ? '光圈：镜头默认' : `光圈 f/${settings.aperture}`, settings.contrast === null ? '对比度：系统' : `对比度 ${settings.contrast.toFixed(2)}`, `白平衡：${wb[settings.whiteBalance]}`].join(' · '));
             syncExecution();
@@ -296,12 +348,19 @@ export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapt
     }
     commitContext({ ...contextRef.current, zoom });
   }
-  function changeStyle(style: CameraStyle) { invalidate(); commitContext({ ...contextRef.current, style }); }
+  function changeStyle(style: CameraStyle) {
+    invalidate();
+    commitContext({ ...contextRef.current, style });
+    if (mounted.current && activeRef.current && readyRef.current) {
+      applyStylePreset(style, contextRef.current.facing);
+    }
+  }
   function changeMode(mode: CameraMode) { invalidate(); commitContext({ ...contextRef.current, mode }); }
   function flipCamera() {
     if (!mounted.current || !activeRef.current || !readyRef.current || captureRef.current || samplingRef.current) return;
     readyRef.current = false; setReady(false); setSwitching(true);
     invalidate('正在切换镜头，准备新方案');
+    setAppliedTuning(null);
     switchTimer.current = setTimeout(cameraError, 10000);
     commitContext({ ...contextRef.current, facing: contextRef.current.facing === 'front' ? 'back' : 'front', zoom: 0, flash: 'off' });
   }
@@ -309,12 +368,14 @@ export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapt
     if (!mounted.current || !activeRef.current) return;
     finishSwitch(); stableAfter.current = Date.now() + GUIDANCE_SETTLE_MS;
     readyRef.current = true; setReady(true);
+    applyStylePreset(contextRef.current.style, contextRef.current.facing);
   }
   function cameraError() {
     if (!mounted.current || !activeRef.current) return;
     finishSwitch(); cancelZoom(); resetStep(); readyRef.current = false; setReady(false);
     enabledRef.current = false; setEnabled(false); loop.current?.stop();
     setStatus({ phase: 'error', message: '相机未能启动，请退出取景器后重试并检查相机权限。' });
+    setAppliedTuning(null);
   }
   function confirmAdjustment() {
     if (!enabledRef.current || !readyRef.current || !activeRef.current || captureRef.current || busyRef.current) return;
@@ -342,7 +403,7 @@ export function useCameraGuidance(cameraRef: React.RefObject<CameraView>, onCapt
       if (mounted.current) { setCapturing(false); setEnabled(false); }
     }
   }
-  return { context, enabled, autoZoom, adjustingZoom, ready, active, capturing, sampling, switching, starting, result, target, executionPhase, status, configMissing, sensorAvailable, tuningMessage,
+  return { context, enabled, autoZoom, adjustingZoom, ready, active, capturing, sampling, switching, starting, result, target, executionPhase, status, configMissing, sensorAvailable, tuningMessage, appliedTuning,
     toggleGuidance, toggleAutoZoom, manualZoom, changeStyle, changeMode, flipCamera, cameraReady, cameraError, capture, confirmAdjustment,
     refresh: () => invalidate('正在重新规划当前画面') };
 }

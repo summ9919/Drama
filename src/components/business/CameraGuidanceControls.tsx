@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../constants/theme';
 import type { GuidanceStatus } from '../../types/guidance';
 
 type Props = {
@@ -15,16 +16,16 @@ export function CameraGuidanceControls(props: Props) {
     <View style={styles.row}>
       <Pressable accessibilityRole="switch" accessibilityLabel="AI 拍摄指导" accessibilityState={{ checked: props.enabled }}
         disabled={props.disabled || props.starting} onPress={props.onToggle} style={[styles.button, props.enabled && styles.selected]}>
-        {working ? <ActivityIndicator size="small" color="#BCF5E4" /> : <Ionicons name="sparkles-outline" size={16} color={props.enabled ? '#BCF5E4' : '#D4E1EA'} />}
-        <Text style={styles.text}>{props.starting ? '连接中' : `AI 指导${props.enabled ? ' 开' : ' 关'}`}</Text>
+        {working ? <ActivityIndicator size="small" color={colors.secondaryFixed} /> : <Ionicons name="sparkles-outline" size={14} color={props.enabled ? colors.secondaryFixed : colors.onSurfaceVariant} />}
+        <Text style={[styles.text, props.enabled && styles.textSelected]}>{props.starting ? '连接中' : `AI 指导${props.enabled ? ' 开' : ' 关'}`}</Text>
       </Pressable>
       <Pressable accessibilityRole="switch" accessibilityLabel="自动变焦" accessibilityState={{ checked: props.autoZoom }}
         disabled={props.disabled} onPress={props.onAutoZoom} style={[styles.button, props.autoZoom && styles.selected]}>
-        <Ionicons name="scan-outline" size={16} color={props.autoZoom ? '#BCF5E4' : '#D4E1EA'} />
-        <Text style={styles.text}>自动变焦{props.autoZoom ? ' 开' : ' 关'}</Text>
+        <Ionicons name="scan-outline" size={14} color={props.autoZoom ? colors.secondaryFixed : colors.onSurfaceVariant} />
+        <Text style={[styles.text, props.autoZoom && styles.textSelected]}>自动变焦{props.autoZoom ? ' 开' : ' 关'}</Text>
       </Pressable>
       {props.enabled && <Pressable accessibilityRole="button" accessibilityLabel="重新规划" disabled={props.disabled || working}
-        onPress={props.onRefresh} style={styles.button}><Ionicons name="refresh-outline" size={18} color="#D4E1EA" /><Text style={styles.text}>重新规划</Text></Pressable>}
+        onPress={props.onRefresh} style={styles.button}><Ionicons name="refresh-outline" size={15} color={colors.onSurfaceVariant} /><Text style={styles.text}>重新规划</Text></Pressable>}
     </View>
     {(props.enabled || props.status.phase === 'error') && <Text testID="guidance-request-status" accessibilityLiveRegion="polite"
       style={props.status.phase === 'error' ? styles.error : styles.status}>{props.status.message}</Text>}
@@ -35,14 +36,14 @@ export function CameraGuidanceControls(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 6 },
-  row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  button: { minHeight: 34, paddingHorizontal: 12, borderRadius: 17, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#1D2A34CC' },
-  selected: { backgroundColor: '#28453DD9' },
-  refresh: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1D2A34CC' },
-  text: { fontSize: 12, color: '#E5EEE9', fontWeight: '500' },
-  error: { fontSize: 11, lineHeight: 16, textAlign: 'center', color: '#F5C5AD', marginTop: 6, backgroundColor: '#141E26E6', borderRadius: 8, padding: 6 },
-  status: { fontSize: 10, lineHeight: 14, textAlign: 'center', color: '#AFC3BB', marginTop: 4 },
-  configButton: { alignSelf: 'center', minHeight: 32, justifyContent: 'center', paddingHorizontal: 12 },
-  configText: { color: '#F3DFB5', fontSize: 12 },
+  container: { gap: 4 },
+  row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  button: { minHeight: 30, paddingHorizontal: 11, borderRadius: 999, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.surfaceContainer },
+  selected: { backgroundColor: colors.primary },
+  text: { fontSize: 10, color: colors.onSurfaceVariant, fontWeight: '600', letterSpacing: 0.3 },
+  textSelected: { color: colors.secondaryFixed },
+  error: { fontSize: 10, lineHeight: 14, textAlign: 'center', color: '#93000A', marginTop: 2, backgroundColor: '#FFDAD6', borderRadius: 8, padding: 6 },
+  status: { fontSize: 9.5, lineHeight: 13, textAlign: 'center', color: colors.onSurfaceVariant, marginTop: 2, opacity: 0.85 },
+  configButton: { alignSelf: 'center', minHeight: 28, justifyContent: 'center', paddingHorizontal: 10 },
+  configText: { color: colors.secondary, fontSize: 11, fontWeight: '600' },
 });

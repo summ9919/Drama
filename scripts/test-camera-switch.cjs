@@ -231,14 +231,15 @@ test('front/back renders preserve CameraView identity and disable controls durin
   };
   const { CameraCapture } = loadModule('src/components/business/CameraCapture.tsx', {
     react: { default: React, useState: value => [typeof value === 'object' ? { width: 400, height: 800 } : value, () => {}] },
-    'react-native': { ActivityIndicator: 'Spinner', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', StyleSheet: { create: value => value } },
+    'react-native': { ActivityIndicator: 'Spinner', Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', StyleSheet: { create: value => value }, Platform: { OS: 'web', select: options => options?.default ?? options?.web } },
     'expo-camera': { CameraView: 'NativeCamera' },
     '@expo/vector-icons': { Ionicons: 'Icon' },
     'expo-linear-gradient': { LinearGradient: 'Gradient' },
     'react-native-safe-area-context': { SafeAreaView: 'SafeArea', useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) },
     'expo-status-bar': { StatusBar: 'StatusBar' },
-    '../../constants/theme': { colors: {} },
+    '../ui/BrandIcon': { BrandIcon: 'BrandIcon' },
     '../../constants/guidance': { CAMERA_STYLES: {} },
+    '../../store/captureStore': { useCaptureStore: selector => selector({ savedUris: [] }) },
     '../../hooks/useCameraGuidance': { useCameraGuidance: () => guide },
     './CameraGuidanceControls': { CameraGuidanceControls: 'GuidanceControls' },
     './CameraDirectionOverlay': { CameraDirectionOverlay: 'DirectionOverlay' },
@@ -263,8 +264,8 @@ test('front/back renders preserve CameraView identity and disable controls durin
   assert.deepEqual(back.path, front.path, 'changing lens must not remount the camera or its ancestors');
   assert.equal(front.node.props.facing, 'front');
   assert.equal(back.node.ref, front.node.ref);
-  const viewport = find(frontTree, node => node.props.testID === 'camera-viewport');
-  assert.equal(find(viewport.node, node => ['Text', 'Pressable', 'Gradient'].includes(node.type)), null, 'no captions, buttons or gradient inside the preview');
+  const viewport = find(frontTree, node => node.props.testID === 'camera-viewfinder');
+  assert.ok(viewport && find(viewport.node, node => node.type === 'NativeCamera'));
   assert.ok(find(viewport.node, node => node.type === 'DirectionOverlay'));
   for (const label of ['切换前后镜头', '拍照']) {
     assert.equal(find(frontTree, node => node.props.accessibilityLabel === label).node.props.disabled, true);

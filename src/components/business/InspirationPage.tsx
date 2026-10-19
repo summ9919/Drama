@@ -7,7 +7,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, shadows } from '../../constants/theme';
 import { inspirationImages } from '../../constants/data';
@@ -24,7 +23,6 @@ export function InspirationPage({ onStartCamera }: Props) {
 
   return (
     <View style={styles.screen}>
-      {/* ── 顶部固定导航栏 ── */}
       <View style={styles.fixedHeader}>
         <PageHeader title="灵感" icon="camera-outline" onPress={onStartCamera} />
       </View>
@@ -32,88 +30,53 @@ export function InspirationPage({ onStartCamera }: Props) {
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text style={styles.lead}>别急着按下快门，先看看光想把你带到哪里。</Text>
 
-        {/* ── Apple 雾态分类胶囊栏 ── */}
         <View style={styles.segmentRow}>
-        {['全部', '人像', '风景', '夜景'].map((item) => {
-          const active = category === item;
-          return (
-            <Pressable
-              key={item}
-              onPress={() => setCategory(item)}
-              style={({ pressed }) => [
-                styles.segmentWrapper,
-                { transform: [{ scale: pressed ? 0.94 : 1 }] },
-              ]}
-            >
-              <View style={styles.segment}>
-                <BlurView
-                  intensity={active ? 60 : 40}
-                  tint="light"
-                  style={[
-                    StyleSheet.absoluteFill,
-                    styles.pillBlur,
-                  ]}
-                />
-                <View
-                  style={[
-                    StyleSheet.absoluteFill,
-                    active ? styles.segmentActiveBg : styles.segmentInactiveBg,
-                  ]}
-                />
-                <View
-                  pointerEvents="none"
-                  style={[
-                    StyleSheet.absoluteFill,
-                    {
-                      borderRadius: 18,
-                      borderWidth: 1.1,
-                      borderColor: active
-                        ? 'rgba(255, 255, 255, 0.95)'
-                        : 'rgba(255, 255, 255, 0.72)',
-                    },
-                  ]}
-                />
-                <Text
-                  style={[
-                    styles.segmentText,
-                    active && styles.segmentTextActive,
-                  ]}
-                >
+          {['全部', '人像', '风景', '夜景'].map((item) => {
+            const active = category === item;
+            return (
+              <Pressable
+                key={item}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                onPress={() => setCategory(item)}
+                style={({ pressed }) => [
+                  styles.segment,
+                  active ? styles.segmentActive : styles.segmentIdle,
+                  { transform: [{ scale: pressed ? 0.95 : 1 }] },
+                ]}
+              >
+                <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
                   {item}
                 </Text>
-              </View>
-            </Pressable>
-          );
-        })}
-      </View>
+              </Pressable>
+            );
+          })}
+        </View>
 
-      {/* ── 瀑布流卡片 ── */}
-      <View style={styles.grid}>
-        {columns.map((column, columnIndex) => (
-          <View key={columnIndex} style={styles.column}>
-            {column.map((item, index) => (
-              <Pressable
-                key={item.title}
-                style={({ pressed }) => [
-                  styles.cardWrapper,
-                  columnIndex === 1 && index === 0 && styles.cardTallWrapper,
-                  columnIndex === 0 && index === 2 && styles.cardTallWrapper,
-                  { transform: [{ scale: pressed ? 0.98 : 1 }] },
-                ]}
-                onPress={onStartCamera}
-              >
-                <View style={styles.card}>
-                  <Image source={{ uri: item.uri }} style={styles.image} />
-                  <LinearGradient
-                    colors={['transparent', 'rgba(20,30,38,0.34)']}
-                    style={styles.overlay}
-                    pointerEvents="none"
-                  />
-                  <View pointerEvents="none" style={styles.cardBorder} />
+        <View style={styles.grid}>
+          {columns.map((column, columnIndex) => (
+            <View key={columnIndex} style={styles.column}>
+              {column.map((item, index) => (
+                <Pressable
+                  key={item.title}
+                  style={({ pressed }) => [
+                    styles.cardWrapper,
+                    columnIndex === 1 && index === 0 && styles.cardTallWrapper,
+                    columnIndex === 0 && index === 2 && styles.cardTallWrapper,
+                    { transform: [{ scale: pressed ? 0.98 : 1 }] },
+                  ]}
+                  onPress={onStartCamera}
+                >
+                  <View style={styles.card}>
+                    <Image source={{ uri: item.uri }} style={styles.image} />
+                    <LinearGradient
+                      colors={['transparent', 'rgba(24, 22, 18, 0.52)']}
+                      style={styles.overlay}
+                      pointerEvents="none"
+                    />
+                    <View pointerEvents="none" style={styles.cardBorder} />
 
-                  {/* 图片上的轻量文字层，不使用独立背景块 */}
-                  <View style={styles.labelContainer}>
-                    <View style={styles.labelContent}>
+                    <View style={styles.labelContainer}>
                       <Text style={styles.title}>{item.title}</Text>
                       <View style={styles.tagRow}>
                         <View style={styles.tagDot} />
@@ -121,13 +84,12 @@ export function InspirationPage({ onStartCamera }: Props) {
                       </View>
                     </View>
                   </View>
-                </View>
-              </Pressable>
-            ))}
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+                </Pressable>
+              ))}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -136,73 +98,57 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     position: 'relative',
-    backgroundColor: colors.canvas,
+    backgroundColor: colors.surface,
   },
   fixedHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 6,
-    backgroundColor: colors.canvas,
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    paddingBottom: 4,
+    backgroundColor: 'rgba(251, 249, 246, 0.92)',
     zIndex: 100,
     borderBottomWidth: 1,
-    borderColor: 'rgba(21, 29, 36, 0.05)',
+    borderColor: 'rgba(45, 42, 38, 0.04)',
   },
   container: {
-    paddingHorizontal: 20,
-    paddingTop: 4,
-    paddingBottom: 100,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 110,
   },
   lead: {
-    color: colors.muted,
-    fontSize: 13.5,
-    lineHeight: 21,
-    marginTop: 10,
+    color: colors.onSurfaceVariant,
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 6,
     marginBottom: 16,
     letterSpacing: 0.2,
   },
-
-  /* 胶囊筛选 */
   segmentRow: {
     flexDirection: 'row',
     gap: 8,
     marginBottom: 18,
   },
-  segmentWrapper: {
-    borderRadius: 18,
+  segment: {
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    borderRadius: 999,
+  },
+  segmentActive: {
+    backgroundColor: colors.primary,
     ...shadows.glassSm,
   },
-  segment: {
-    borderRadius: 18,
-    overflow: 'hidden',
-    position: 'relative',
-    paddingVertical: 7.5,
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pillBlur: {
-    borderRadius: 18,
-  },
-  segmentActiveBg: {
-    borderRadius: 18,
-    backgroundColor: 'rgba(45, 106, 148, 0.12)',
-  },
-  segmentInactiveBg: {
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+  segmentIdle: {
+    backgroundColor: colors.surfaceContainer,
   },
   segmentText: {
-    color: colors.muted,
-    fontSize: 12.5,
-    fontWeight: '500',
-    zIndex: 2,
+    color: colors.onSurfaceVariant,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.35,
   },
   segmentTextActive: {
-    color: colors.primary,
-    fontWeight: '700',
+    color: colors.whiteWarm,
   },
 
-  /* 瀑布流 */
   grid: {
     flexDirection: 'row',
     gap: 12,
@@ -215,7 +161,7 @@ const styles = StyleSheet.create({
   cardWrapper: {
     width: '100%',
     height: 215,
-    borderRadius: 22,
+    borderRadius: 24,
     ...shadows.glassMd,
   },
   cardTallWrapper: {
@@ -224,9 +170,9 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     height: '100%',
-    borderRadius: 22,
+    borderRadius: 24,
     overflow: 'hidden',
-    backgroundColor: colors.paleMist,
+    backgroundColor: colors.surfaceHigh,
     position: 'relative',
   },
   image: {
@@ -239,27 +185,21 @@ const styles = StyleSheet.create({
   },
   cardBorder: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 22,
+    borderRadius: 24,
     borderWidth: 1.2,
-    borderColor: 'rgba(255, 255, 255, 0.85)',
+    borderColor: 'rgba(255, 255, 255, 0.80)',
   },
-
-  /* 直接叠加在图片上的文字 */
   labelContainer: {
     position: 'absolute',
-    bottom: 15,
-    left: 15,
-    right: 15,
-  },
-  labelContent: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    zIndex: 2,
+    bottom: 14,
+    left: 14,
+    right: 14,
   },
   title: {
     color: colors.whiteWarm,
     fontSize: 13.5,
-    fontWeight: '700',
+    fontWeight: '600',
+    letterSpacing: 0.1,
   },
   tagRow: {
     flexDirection: 'row',
@@ -274,8 +214,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.butter,
   },
   tag: {
-    color: 'rgba(254, 253, 251, 0.85)',
+    color: 'rgba(251, 249, 246, 0.86)',
     fontSize: 10.5,
     fontWeight: '500',
+    letterSpacing: 0.3,
   },
 });

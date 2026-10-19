@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, StyleSheet, Text, View, Vibration } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, shadows } from '../../constants/theme';
 
 function useReadyPulse(active: boolean) {
   const pulse = useRef(new Animated.Value(0)).current;
@@ -39,14 +40,29 @@ export function CameraReadyFrame({ active, width, height }: { active: boolean; w
   </View>;
 }
 
-export function CameraReadyNotice({ active, message }: { active: boolean; message: string }) {
+export function CameraReadyNotice({ active, message, action }: { active: boolean; message: string; action?: React.ReactNode }) {
   useEffect(() => { if (active) Vibration.vibrate(25); }, [active]);
-  return <View style={styles.noticeSlot}>
-    {active ? <View testID="camera-ready-notice" accessible accessibilityLabel="可以拍照了，已完成本地对准" accessibilityLiveRegion="polite" style={styles.notice}>
-      <View style={styles.check}><Ionicons name="checkmark" size={23} color="#102D24" /></View>
-      <View><Text style={styles.readyTitle}>可以拍照了</Text><Text style={styles.readyDetail}>构图已对准 · 按下快门定格</Text></View>
-      <View style={styles.readyDot} />
-    </View> : <Text accessibilityLiveRegion="polite" style={styles.message}>{message}</Text>}
+  return <View style={styles.banner}>
+    {active ? (
+      <View testID="camera-ready-notice" accessible accessibilityLabel="可以拍照了，已完成本地对准" accessibilityLiveRegion="polite" style={styles.bannerInner}>
+        <View style={styles.check}>
+          <Ionicons name="checkmark" size={17} color={colors.primary} />
+        </View>
+        <View style={styles.bannerTextBlock}>
+          <Text style={styles.readyTitle}>可以拍照了</Text>
+          <Text style={styles.readyDetail} numberOfLines={1}>构图已对准 · 按下快门定格</Text>
+        </View>
+        {action ? <View style={styles.actionSlot}>{action}</View> : null}
+      </View>
+    ) : (
+      <View style={styles.bannerInner}>
+        <View style={styles.bulb}>
+          <Ionicons name="bulb-outline" size={15} color={colors.onSecondaryContainer} />
+        </View>
+        <Text accessibilityLiveRegion="polite" style={styles.message} numberOfLines={2}>{message}</Text>
+        {action ? <View style={styles.actionSlot}>{action}</View> : null}
+      </View>
+    )}
   </View>;
 }
 
@@ -60,18 +76,75 @@ export function CameraShutterHalo({ active }: { active: boolean }) {
 }
 
 const styles = StyleSheet.create({
-  corner: { position: 'absolute', width: 32, height: 32, borderColor: '#83FFD0', shadowColor: '#70F9C2', shadowOpacity: 0.7, shadowRadius: 7 },
+  banner: {
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(251, 249, 246, 0.88)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.75)',
+    ...shadows.glassMd,
+  },
+  bannerInner: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 7,
+  },
+  bulb: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(254, 221, 132, 0.78)',
+    flexShrink: 0,
+  },
+  check: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.secondaryFixed,
+    flexShrink: 0,
+  },
+  bannerTextBlock: {
+    flex: 1,
+    minWidth: 0,
+    gap: 1,
+  },
+  message: {
+    flex: 1,
+    color: colors.primary,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '600',
+    letterSpacing: 0.15,
+  },
+  readyTitle: {
+    color: colors.primary,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+  readyDetail: {
+    color: colors.onSurfaceVariant,
+    fontSize: 9,
+    lineHeight: 12,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+  },
+  actionSlot: {
+    flexShrink: 0,
+  },
+  corner: { position: 'absolute', width: 30, height: 30, borderColor: colors.secondaryFixed, shadowColor: colors.secondaryFixedDim, shadowOpacity: 0.7, shadowRadius: 6 },
   tl: { top: 3, left: 3, borderTopWidth: 3, borderLeftWidth: 3, borderTopLeftRadius: 12 },
   tr: { top: 3, right: 3, borderTopWidth: 3, borderRightWidth: 3, borderTopRightRadius: 12 },
   bl: { bottom: 3, left: 3, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomLeftRadius: 12 },
   br: { bottom: 3, right: 3, borderBottomWidth: 3, borderRightWidth: 3, borderBottomRightRadius: 12 },
-  lockRing: { position: 'absolute', width: 50, height: 50, borderRadius: 25, borderWidth: 1.5, borderColor: '#83FFD0' },
-  noticeSlot: { minHeight: 32, justifyContent: 'center', marginBottom: 4 },
-  notice: { height: 48, borderRadius: 16, backgroundColor: '#203F35', borderWidth: 1, borderColor: '#72E6B77A', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
-  check: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#89F5CB', alignItems: 'center', justifyContent: 'center' },
-  readyTitle: { color: '#DFFFF0', fontSize: 18, fontWeight: '800', letterSpacing: 1.5 },
-  readyDetail: { color: '#A7D9C2', fontSize: 10, marginTop: 1 },
-  readyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#89F5CB', marginLeft: 6 },
-  message: { color: '#BCD3CB', fontSize: 12, lineHeight: 18, textAlign: 'center' },
-  shutterHalo: { position: 'absolute', width: 78, height: 78, borderRadius: 39, borderWidth: 1.5, borderColor: '#83FFD0' },
+  lockRing: { position: 'absolute', width: 50, height: 50, borderRadius: 25, borderWidth: 1.5, borderColor: colors.secondaryFixed },
+  shutterHalo: { position: 'absolute', width: 84, height: 84, borderRadius: 42, borderWidth: 1.5, borderColor: colors.secondaryFixed },
 });

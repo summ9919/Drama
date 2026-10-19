@@ -1,34 +1,130 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, fonts } from '../../constants/theme';
-import { IconButton } from './IconButton';
+import { colors, shadows } from '../../constants/theme';
+import { BrandIcon } from './BrandIcon';
 
-type Props = { title: string; icon?: keyof typeof Ionicons.glyphMap; onPress?: () => void };
+type Props = {
+  title: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  onPress?: () => void;
+};
 
-export function PageHeader({ title, icon = 'sparkles-outline', onPress }: Props) {
+export function PageHeader({ title, icon = 'options-outline', onPress }: Props) {
   return (
     <View style={styles.row}>
-      <Text style={styles.title}>{title}</Text>
-      {onPress ? <IconButton icon={icon} onPress={onPress} /> : <Pressable style={styles.spacer} />}
+      <View style={styles.brand}>
+        <View style={styles.logo}>
+          <BrandIcon size={34} />
+        </View>
+        <View style={styles.brandText}>
+          <Text style={styles.brandName} numberOfLines={1}>Drama相机</Text>
+          <Text style={styles.brandSub} numberOfLines={1}>{title}</Text>
+        </View>
+      </View>
+
+      <View style={styles.actions}>
+        {onPress ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="页面操作"
+            onPress={onPress}
+            style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
+          >
+            {icon === 'camera-outline' || icon === 'camera' ? <BrandIcon size={24} /> : <Ionicons name={icon} size={21} color={colors.onSurfaceVariant} />}
+          </Pressable>
+        ) : (
+          <View style={styles.iconButton}>
+            {icon === 'camera-outline' || icon === 'camera' ? <BrandIcon size={24} /> : <Ionicons name={icon} size={21} color={colors.onSurfaceVariant} />}
+          </View>
+        )}
+
+        <View style={styles.avatarWrap}>
+          <Image
+            source={require('../../../assets/editorial/editorial_3.jpg')}
+            style={styles.avatar}
+          />
+          <View pointerEvents="none" style={styles.avatarRing} />
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   row: {
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 4,
-    minHeight: 48,
+    gap: 8,
   },
-  title: {
+  brand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 1,
+  },
+  logo: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandText: {
+    justifyContent: 'center',
+    flexShrink: 1,
+  },
+  brandName: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: 28,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '600',
+    letterSpacing: -0.2,
   },
-  spacer: { width: 42, height: 42 },
+  brandSub: {
+    color: colors.onSurfaceVariant,
+    fontSize: 10,
+    lineHeight: 12,
+    fontWeight: '500',
+    letterSpacing: 0.6,
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pressed: {
+    backgroundColor: colors.surfaceContainer,
+  },
+  avatarWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    ...shadows.glassSm,
+  },
+  avatar: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+  },
+  avatarRing: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 17,
+    borderWidth: 2,
+    borderColor: 'rgba(254, 221, 132, 0.55)',
+  },
 });

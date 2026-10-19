@@ -1,4 +1,4 @@
-import type { CameraStyle } from '../types/guidance';
+import type { CameraStyle, WhiteBalance } from '../types/guidance';
 import { GUIDANCE_EXAMPLE, GUIDANCE_SCHEMA } from './guidanceProtocol';
 
 
@@ -18,6 +18,17 @@ export const CAMERA_STYLES: Record<CameraStyle, string> = {
   奶杏: '温暖奶油色调、柔和侧光、亲近松弛的构图，避免杂乱背景。',
   薄荷: '清新轻盈、适当留白、自然绿色与低饱和环境，保持主体突出。',
   胶片: '有故事感的环境构图、自然光影层次、克制的留白，避免刻意摆拍。',
+};
+
+// Hardware presets behind the styles. Values follow the public conventions of
+// Canon Picture Styles and widely used Fujifilm film recipes: portrait/film
+// looks use a warmer white balance with softer contrast, while fresh/clear
+// looks keep neutral-to-cool white balance and slightly crisper contrast.
+export const CAMERA_STYLE_PRESETS: Record<CameraStyle, { whiteBalance: WhiteBalance; contrast: number | null }> = {
+  清透: { whiteBalance: 'daylight', contrast: null },
+  奶杏: { whiteBalance: 'cloudy', contrast: 0.9 },
+  薄荷: { whiteBalance: 'fluorescent', contrast: 1.06 },
+  胶片: { whiteBalance: 'daylight', contrast: 0.95 },
 };
 
 export const GUIDANCE_SYSTEM_PROMPT = `你是手机摄影构图助手。用户只提交一次当前画面。你须一次给出可完成的构图终点与相机参数；客户端用传感器辅助对准并停稳800ms后直接提示拍照，不会再次请求模型复核。不能依赖“下一轮再看”才能完成的方案。
