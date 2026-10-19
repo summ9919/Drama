@@ -13,7 +13,6 @@ import {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { BrandIcon } from './BrandIcon';
 import { colors, shadows } from '../../constants/theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'glass' | 'almond' | 'butter' | 'dark';
@@ -268,9 +267,7 @@ export function PrimaryButton({
               />
             ) : (
               <>
-                {icon && (icon === 'camera-outline' || icon === 'camera' ? (
-                  <BrandIcon size={compact ? 20 : 24} />
-                ) : (
+                {icon && (
                   <Ionicons
                     name={icon}
                     size={compact ? 16 : 18}
@@ -281,7 +278,7 @@ export function PrimaryButton({
                     }
                     style={styles.icon}
                   />
-                ))}
+                )}
                 <Text
                   style={[
                     styles.text,

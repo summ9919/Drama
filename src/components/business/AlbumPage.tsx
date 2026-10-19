@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { BrandIcon } from '../ui/BrandIcon';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, shadows } from '../../constants/theme';
@@ -279,11 +278,11 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
                         </Pressable>
 
                         <View style={styles.tagChip}>
-                          {index % 2 === 0 ? <BrandIcon size={14} /> : <Ionicons
-                            name="crop-outline"
+                          <Ionicons
+                            name={index % 2 === 0 ? 'camera-outline' : 'crop-outline'}
                             size={11}
                             color={colors.secondary}
-                          />}
+                          />
                           <Text style={styles.tagChipText} numberOfLines={1}>
                             {item.tag ?? 'AI 辅助构图'}
                           </Text>

@@ -23,7 +23,6 @@ import { digitalZoomFactor } from '../../lib/cameraGeometry';
 import { getCompositionMessage } from '../../lib/compositionMessage';
 import { getDirectionCue } from '../../lib/guidanceDirection';
 import { useCaptureStore } from '../../store/captureStore';
-import { BrandIcon } from '../ui/BrandIcon';
 
 type Props = {
   cameraRef: React.RefObject<CameraView>;
@@ -118,7 +117,7 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
         {/* ── Brand header ── */}
         <View style={styles.header}>
           <View style={styles.headerBrand}>
-            <BrandIcon size={34} />
+            <Ionicons name="camera-outline" size={29} color={colors.primary} />
             <View>
               <Text style={styles.headerTitle}>Drama相机</Text>
               <Text style={styles.headerSubtitle}>AI 电影画质</Text>

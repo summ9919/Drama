@@ -237,7 +237,6 @@ test('front/back renders preserve CameraView identity and disable controls durin
     'expo-linear-gradient': { LinearGradient: 'Gradient' },
     'react-native-safe-area-context': { SafeAreaView: 'SafeArea', useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) },
     'expo-status-bar': { StatusBar: 'StatusBar' },
-    '../ui/BrandIcon': { BrandIcon: 'BrandIcon' },
     '../../constants/guidance': { CAMERA_STYLES: {} },
     '../../store/captureStore': { useCaptureStore: selector => selector({ savedUris: [] }) },
     '../../hooks/useCameraGuidance': { useCameraGuidance: () => guide },

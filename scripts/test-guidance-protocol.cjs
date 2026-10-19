@@ -75,7 +75,6 @@ test('vision HTTP request includes shared schema and real image, then valid para
       '@expo/vector-icons': { Ionicons: 'Icon' },
       'react-native-safe-area-context': { SafeAreaView: 'SafeArea', useSafeAreaInsets: () => ({ top: 24, bottom: 24 }) },
       'expo-status-bar': { StatusBar: 'StatusBar' },
-      '../ui/BrandIcon': { BrandIcon: 'BrandIcon' },
       '../../store/captureStore': { useCaptureStore: selector => selector({ savedUris: [] }) },
       '../../hooks/useCameraGuidance': { useCameraGuidance: () => guide },
       './CameraDirectionOverlay': { CameraDirectionOverlay: 'DirectionOverlay' },

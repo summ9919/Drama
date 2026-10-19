@@ -15,8 +15,6 @@ function render(name, svg, size) {
 
 for (const [name, size] of Object.entries({
   'icon.png': 1024,
-  'logo.png': 1024,
-  'logo_icon.png': 256,
   'favicon.png': 64,
   'icon-hd-v2.png': 2048,
   'icon-hd-original-ratio.png': 2048,

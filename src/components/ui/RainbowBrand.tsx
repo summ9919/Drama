@@ -1,28 +1,31 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../constants/theme';
-import { BrandIcon } from './BrandIcon';
+import { Image, StyleSheet, View } from 'react-native';
 
 export function RainbowBrand() {
   return (
     <View style={styles.container}>
-      <BrandIcon size={40} />
-      <Text style={styles.wordmark}>Drama相机</Text>
+      <Image
+        source={require('../../../assets/logo.png')}
+        accessibilityLabel="Drama相机"
+        style={styles.logoImage}
+        resizeMode="contain"
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    width: 144,
     height: 48,
-    flexDirection: 'row',
-    gap: 8,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    overflow: 'hidden',
   },
-  wordmark: {
-    color: colors.ink,
-    fontSize: 16,
-    fontWeight: '600',
+  logoImage: {
+    width: 144,
+    height: 48,
+    maxWidth: 144,
+    maxHeight: 48,
   },
 });

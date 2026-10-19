@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, shadows } from '../../constants/theme';
-import { BrandIcon } from './BrandIcon';
 
 type Props = {
   title: string;
@@ -21,7 +20,7 @@ export function PageHeader({ title, icon = 'options-outline', onPress }: Props) 
     <View style={styles.row}>
       <View style={styles.brand}>
         <View style={styles.logo}>
-          <BrandIcon size={34} />
+          <Ionicons name="camera-outline" size={29} color={colors.primary} />
         </View>
         <View style={styles.brandText}>
           <Text style={styles.brandName} numberOfLines={1}>Drama相机</Text>
@@ -37,11 +36,11 @@ export function PageHeader({ title, icon = 'options-outline', onPress }: Props) 
             onPress={onPress}
             style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
           >
-            {icon === 'camera-outline' || icon === 'camera' ? <BrandIcon size={24} /> : <Ionicons name={icon} size={21} color={colors.onSurfaceVariant} />}
+            <Ionicons name={icon} size={21} color={colors.onSurfaceVariant} />
           </Pressable>
         ) : (
           <View style={styles.iconButton}>
-            {icon === 'camera-outline' || icon === 'camera' ? <BrandIcon size={24} /> : <Ionicons name={icon} size={21} color={colors.onSurfaceVariant} />}
+            <Ionicons name={icon} size={21} color={colors.onSurfaceVariant} />
           </View>
         )}
 
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   logo: {
-    width: 34,
+    width: 30,
     height: 34,
     alignItems: 'center',
     justifyContent: 'center',

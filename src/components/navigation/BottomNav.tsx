@@ -11,7 +11,6 @@ import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadows } from '../../constants/theme';
-import { BrandIcon } from '../ui/BrandIcon';
 
 const labels: Record<string, string> = {
   camera: 'AI 相机',
@@ -72,7 +71,7 @@ export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps)
                 accessibilityLabel={descriptors[route.key].options.tabBarAccessibilityLabel}
               >
                 <View style={styles.iconWrap}>
-                  {route.name === 'camera' ? <BrandIcon size={26} /> : <Ionicons
+                  <Ionicons
                     name={
                       focused
                         ? iconsFilled[route.name] ?? 'ellipse'
@@ -80,7 +79,7 @@ export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps)
                     }
                     size={23}
                     color={focused ? colors.primary : colors.onSurfaceVariant}
-                  />}
+                  />
                   {focused && <View style={styles.activeDot} />}
                 </View>
                 <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
