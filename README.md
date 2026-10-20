@@ -49,9 +49,24 @@ Drama 是一个基于 **Expo + React Native** 的 AI 摄影指导应用，优先
     <td align="center"><img src="docs/images/profile.jpg" alt="个人页面" width="260" /></td>
   </tr>
   <tr>
-    <td align="center"><sub>选择模式与风格，开启相机权限</sub></td>
-    <td align="center"><sub>选择服务商，填写 API Key</sub></td>
-    <td align="center"><sub>个人中心与 AI 配置入口</sub></td>
+    <td align="center"><sub>电影画质导引，探索光影灵感与开启相机</sub></td>
+    <td align="center"><sub>选择服务商（Kimi / DeepSeek），填写 API Key</sub></td>
+    <td align="center"><sub>创作者主页、拍摄统计与 AI 配置入口</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th align="center">✨ 灵感广场</th>
+    <th align="center">🖼️ 拍摄相册</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/images/inspiration.jpg" alt="Drama 灵感页面" width="260" /></td>
+    <td align="center"><img src="docs/images/album.jpg" alt="Drama 相册页面" width="260" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>精选光影灵感与多场景构图预设</sub></td>
+    <td align="center"><sub>拍摄作品画廊、胶片参数与质感微调</sub></td>
   </tr>
 </table>
 
@@ -147,7 +162,7 @@ flowchart LR
 
 <div align="center">
 <img src="docs/images/home.jpg" alt="拍摄首页" width="280" />
-<p><sub>取景器页面：选择模式与风格，点击「开启相机」</sub></p>
+<p><sub>拍摄首页：浏览光影与风格预设，点击「开启相机」进入取景器</sub></p>
 </div>
 
 1. 允许相机权限，进入取景器，选择人像、风景或夜景。

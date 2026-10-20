@@ -7,6 +7,8 @@
 | [home.jpg](home.jpg) | 拍摄首页，尚未授予相机权限 |
 | [ai-config.jpg](ai-config.jpg) | AI 配置页，选择 Kimi，API Key 留空 |
 | [profile.jpg](profile.jpg) | 「我的」页面与 AI 配置入口 |
+| [inspiration.jpg](inspiration.jpg) | 灵感页面，构图与光影灵感探索 |
+| [album.jpg](album.jpg) | 相册页面，精选作品与时光画廊 |
 
 截图未输入真实密钥，未发起模型请求，也未访问摄像头。首页横幅是项目已有的功能展示素材；截图中的部分卡片仍为展示内容，功能支持情况以根目录 README 为准。
 
