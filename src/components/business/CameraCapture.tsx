@@ -17,6 +17,7 @@ import { CAMERA_STYLES } from '../../constants/guidance';
 import type { CameraStyle } from '../../types/guidance';
 import { useCameraGuidance } from '../../hooks/useCameraGuidance';
 import { CameraGuidanceControls } from './CameraGuidanceControls';
+import { CameraParameterPanel } from './CameraParameterPanel';
 import { CameraDirectionOverlay } from './CameraDirectionOverlay';
 import { CameraReadyFrame, CameraReadyNotice, CameraShutterHalo } from './CameraReadyEffects';
 import { digitalZoomFactor } from '../../lib/cameraGeometry';
@@ -70,11 +71,12 @@ function cueLabel(cue: ReturnType<typeof getDirectionCue>): string {
 export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOpenGallery }: Props) {
   const guide = useCameraGuidance(cameraRef, onCapture);
   const [viewfinder, setViewfinder] = useState({ width: 0, height: 0 });
+  const [tuningOpen, setTuningOpen] = useState(false);
   const savedUris = useCaptureStore((state) => state.savedUris);
   const galleryThumb = savedUris[0];
 
   const { context } = guide;
-  const blocked = !guide.active || !guide.ready || guide.capturing || guide.sampling;
+  const blocked = !guide.active || !guide.ready || guide.capturing || guide.sampling || guide.adjustingParameters;
   const canShoot = guide.enabled && guide.executionPhase === 'ready';
   const message = guide.switching
     ? '正在切换镜头…'
@@ -93,10 +95,8 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
 
   const cue = guide.enabled && guide.result ? getDirectionCue(guide.result.advice) : null;
   const showCue = cue && cue.kind !== 'hold' && cue.kind !== 'uncertain';
-  const match = canShoot ? 98 : Math.min(99, Math.max(88, Math.round((guide.result?.advice.confidence ?? 0.92) * 100)));
 
-  const cameraAdvice = guide.result?.advice.camera;
-  const aperture = cameraAdvice?.aperture ?? null;
+  const aperture = guide.appliedTuning?.aperture ?? context.capabilities?.apertures[0] ?? null;
   const whiteBalance = guide.appliedTuning?.whiteBalance && guide.appliedTuning.whiteBalance !== 'keep'
     ? WHITE_BALANCE_LABEL[guide.appliedTuning.whiteBalance] ?? '自动'
     : '自动';
@@ -145,7 +145,7 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
         </View>
 
         <View style={styles.body}>
-          {/* ── Scene & match pills ── */}
+          {/* ── Scene modes ── */}
           <View style={styles.sceneRow}>
             <View style={styles.scenePill}>
               <View style={styles.sceneDot} />
@@ -166,12 +166,6 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
                   </Pressable>
                 );
               })}
-            </View>
-
-            <View style={styles.matchPill}>
-              <Ionicons name="sparkles" size={14} color={colors.secondary} />
-              <Text style={styles.matchLabel}>构图契合</Text>
-              <Text style={styles.matchValue}>{match}%</Text>
             </View>
           </View>
 
@@ -321,13 +315,14 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
               <View style={styles.paramTitleRow}>
                 <View style={styles.paramDot} />
                 <Text style={styles.paramTitle}>相机实时参数</Text>
-                <Ionicons name="checkmark-circle" size={15} color={colors.secondary} />
               </View>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="打开 AI 调参配置"
-                onPress={onConfigure}
-                style={({ pressed }) => [styles.tuneButton, pressed && { opacity: 0.7 }]}
+                accessibilityLabel="微调相机参数"
+                accessibilityState={{ expanded: tuningOpen }}
+                disabled={blocked || guide.executionPhase === 'parameters'}
+                onPress={() => setTuningOpen(true)}
+                style={({ pressed }) => [styles.tuneButton, (blocked || pressed) && { opacity: 0.7 }]}
               >
                 <Ionicons name="options-outline" size={13} color={colors.onSurfaceVariant} />
                 <Text style={styles.tuneButtonText}>微调</Text>
@@ -356,7 +351,7 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
           <CameraGuidanceControls
             enabled={guide.enabled}
             starting={guide.starting}
-            disabled={guide.capturing}
+            disabled={guide.capturing || guide.adjustingParameters}
             autoZoom={guide.autoZoom}
             status={guide.status}
             configMissing={guide.configMissing}
@@ -411,7 +406,7 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="拍照"
-                disabled={!guide.ready || guide.capturing || !guide.active || guide.executionPhase === 'parameters'}
+                disabled={!guide.ready || guide.capturing || guide.adjustingParameters || !guide.active || guide.executionPhase === 'parameters'}
                 onPress={() => void guide.capture()}
                 style={({ pressed }) => [
                   styles.shutter,
@@ -460,6 +455,10 @@ export function CameraCapture({ cameraRef, onClose, onCapture, onConfigure, onOp
           </View>
         </View>
       </SafeAreaView>
+      {tuningOpen && <CameraParameterPanel visible={tuningOpen} context={context}
+        appliedTuning={guide.appliedTuning} disabled={blocked || guide.executionPhase === 'parameters'}
+        busy={guide.adjustingParameters} message={guide.tuningMessage}
+        onClose={() => setTuningOpen(false)} onChange={guide.adjustParameters} />}
     </View>
   );
 }
@@ -575,28 +574,6 @@ const styles = StyleSheet.create({
   sceneModeTextActive: {
     color: colors.onSecondaryContainer,
     fontWeight: '700',
-  },
-  matchPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: colors.surfaceContainer,
-    ...shadows.glassSm,
-  },
-  matchLabel: {
-    color: colors.onSurfaceVariant,
-    fontSize: 10,
-    fontWeight: '500',
-    letterSpacing: 0.4,
-  },
-  matchValue: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.3,
   },
 
   /* viewfinder */

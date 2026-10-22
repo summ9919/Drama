@@ -59,6 +59,23 @@ test('HTTP errors are actionable without exposing response bodies', async () => 
   }
 });
 
+test('custom connection uses the supplied endpoint, model and key without provider-specific options', async () => {
+  let sent;
+  const { testAIConnection } = loadModule('src/lib/aiClient.ts', {}, { fetch: async (url, options) => {
+    sent = { url, ...options, body: JSON.parse(options.body) };
+    return { ok: true, json: async () => ({ choices: [{ message: { content: 'OK' } }] }) };
+  } });
+  await testAIConnection('custom', {
+    apiKey: ' custom-test-secret ', baseUrl: ' https://vision.example.test/api/v1/chat/completions/ ', model: ' custom-vision-model ',
+  });
+  assert.equal(sent.url, 'https://vision.example.test/api/v1/chat/completions');
+  assert.equal(sent.headers.Authorization, 'Bearer custom-test-secret');
+  assert.equal(sent.body.model, 'custom-vision-model');
+  assert.equal('reasoning_effort' in sent.body, false);
+  assert.equal('response_format' in sent.body, false);
+  assert.equal(typeof sent.body.messages[0].content, 'string');
+});
+
 test('empty / invalid successful responses do not falsely pass the test', async () => {
   for (const json of [async () => ({}), async () => ({ choices: [{ message: { content: '' } }] }), async () => { throw new Error('bad JSON'); }]) {
     const { testAIConnection } = loadModule('src/lib/aiClient.ts', {}, { fetch: async () => ({ ok: true, json }) });
@@ -102,6 +119,42 @@ test('providers survive reload independently; ordinary storage never contains ke
   assert.equal((await config.loadAISettings()).profiles.deepseek.apiKey, profile.apiKey);
 });
 
+test('legacy settings gain an independent custom profile that survives selection, reload and key removal', async () => {
+  let raw = JSON.stringify({ provider: 'kimi', profiles: {
+    deepseek: { baseUrl: profile.baseUrl, model: profile.model },
+    kimi: { baseUrl: 'https://api.moonshot.cn/v1', model: 'kimi-k3' },
+  } });
+  const keys = { deepseek: profile.apiKey, kimi: 'kimi-test-secret' };
+  const mocks = {
+    './storage': { captureStorage: { get: async () => raw, set: async (_key, value) => { raw = value; } } },
+    './aiSecrets': { readAIKey: async provider => keys[provider], writeAIKey: async (provider, key) => { keys[provider] = key; } },
+  };
+  const config = loadModule('src/lib/aiConfig.ts', mocks);
+  const legacy = await config.loadAISettings();
+  assert.equal(legacy.provider, 'kimi');
+  assert.equal(legacy.profiles.custom.apiKey, '');
+  assert.equal(legacy.profiles.custom.baseUrl, '');
+  assert.equal(legacy.profiles.custom.model, '');
+  const custom = { apiKey: 'custom-test-secret', baseUrl: 'https://vision.example.test/v1', model: 'custom-vision-model' };
+  await config.saveAIProfile('custom', custom);
+  const reloaded = loadModule('src/lib/aiConfig.ts', mocks);
+  const active = await reloaded.getActiveAIConfig();
+  assert.equal(active.provider, 'custom');
+  for (const field of ['apiKey', 'baseUrl', 'model']) assert.equal(active[field], custom[field]);
+  assert.equal(raw.includes('apiKey'), false);
+  for (const key of Object.values(keys)) assert.equal(raw.includes(key), false);
+  await reloaded.saveAIProfile('deepseek', profile);
+  assert.equal((await reloaded.loadAISettings()).profiles.custom.apiKey, custom.apiKey);
+  assert.equal((await reloaded.loadAISettings()).profiles.custom.baseUrl, custom.baseUrl);
+  await reloaded.clearAIKey('custom');
+  const cleared = await reloaded.loadAISettings();
+  assert.equal(cleared.provider, 'deepseek');
+  assert.equal(cleared.profiles.custom.apiKey, '');
+  assert.equal(cleared.profiles.custom.model, custom.model);
+  assert.equal(cleared.profiles.deepseek.apiKey, profile.apiKey);
+  assert.equal(cleared.profiles.kimi.apiKey, 'kimi-test-secret');
+});
+
 test('web keys persist only in module memory and can be removed', async () => {
   const secrets = loadModule('src/lib/aiSecrets.web.ts');
   await secrets.writeAIKey('deepseek', profile.apiKey);
@@ -109,4 +162,9 @@ test('web keys persist only in module memory and can be removed', async () => {
   assert.equal(await loadModule('src/lib/aiSecrets.web.ts').readAIKey('deepseek'), null);
   await secrets.writeAIKey('deepseek', '');
   assert.equal(await secrets.readAIKey('deepseek'), null);
+  await secrets.writeAIKey('custom', 'custom-test-secret');
+  assert.equal(await secrets.readAIKey('custom'), 'custom-test-secret');
+  assert.equal(await loadModule('src/lib/aiSecrets.web.ts').readAIKey('custom'), null);
+  await secrets.writeAIKey('custom', '');
+  assert.equal(await secrets.readAIKey('custom'), null);
 });

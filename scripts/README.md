@@ -4,6 +4,7 @@
 
 ```powershell
 node --test scripts/test-ai-config.cjs scripts/test-camera-guidance.cjs scripts/test-camera-switch.cjs scripts/test-composition-target.cjs scripts/test-guidance-protocol.cjs scripts/test-guidance-execution.cjs scripts/test-camera-tuning.cjs
+node --test scripts/test-camera-parameters.cjs
 npx tsc --noEmit
 node scripts/export-guidance-schema.cjs
 ```
@@ -38,5 +39,7 @@ node scripts/export-guidance-schema.cjs
 开发版可重启Metro并清缓存后加载；已安装的独立APK需要重新打包安装。模拟测试不能替代真实模型和真机验证。
 
 ## 原生参数验收
+
+点击“相机实时参数”右侧的“微调”，在底部面板选择参数并左右拨动实体风格的刻度滚轮，金色指针对应当前值，松手吸附档位并应用。触摸滚轮不跳值，可连续多次拨动，也可用两侧按钮逐格调整。变焦范围1–4倍，对比度范围0.80–1.20；白平衡和光圈按镜头支持的档位选择。固定光圈、缺少原生模块或不支持的参数显示为不可调整。手动应用后AI指导关闭，避免覆盖手动设置；需要时可重新开启。检查应用失败时仍显示上次成功值、应用期间不能拍照或切换镜头。
 
 本次新增modules/camera-tuning，需要重新构建Android开发包或APK，Expo Go不支持原生设置。检查本机支持的白平衡和对比度、设置失败不显示可拍、关闭指导后迟到回执不能亮起特效。可拍状态检查四角、中心环、快门、文字和短振动；系统减少动态效果时不做呼吸动画。原生代码尚需Android SDK编译和真机验收。

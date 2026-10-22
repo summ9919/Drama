@@ -1,4 +1,4 @@
-export type AIProvider = 'deepseek' | 'kimi';
+export type AIProvider = 'deepseek' | 'kimi' | 'custom';
 
 export type AIProfile = {
   baseUrl: string;

@@ -1,4 +1,4 @@
-import { createAISettings } from '../constants/ai';
+import { AI_PROVIDER_IDS, createAISettings } from '../constants/ai';
 import type { AIProfile, AIProvider, AISettings } from '../types/ai';
 import { captureStorage } from './storage';
 import { readAIKey, writeAIKey } from './aiSecrets';
@@ -10,14 +10,14 @@ export async function loadAISettings(): Promise<AISettings> {
   const raw = await captureStorage.get(SETTINGS_KEY);
   if (raw) {
     const data = JSON.parse(raw);
-    if (data?.provider === 'deepseek' || data?.provider === 'kimi') settings.provider = data.provider;
-    for (const provider of ['deepseek', 'kimi'] as const) {
+    if (AI_PROVIDER_IDS.includes(data?.provider)) settings.provider = data.provider;
+    for (const provider of AI_PROVIDER_IDS) {
       const profile = data?.profiles?.[provider];
       if (typeof profile?.baseUrl === 'string') settings.profiles[provider].baseUrl = profile.baseUrl;
       if (typeof profile?.model === 'string') settings.profiles[provider].model = profile.model;
     }
   }
-  await Promise.all((['deepseek', 'kimi'] as const).map(async provider => {
+  await Promise.all(AI_PROVIDER_IDS.map(async provider => {
     settings.profiles[provider].apiKey = await readAIKey(provider) ?? '';
   }));
   return settings;
@@ -31,7 +31,7 @@ export async function saveAIProfile(provider: AIProvider, profile: AIProfile) {
   settings.profiles[provider] = profile;
   await captureStorage.set(SETTINGS_KEY, JSON.stringify({
     provider,
-    profiles: Object.fromEntries((['deepseek', 'kimi'] as const).map(id => [id, {
+    profiles: Object.fromEntries(AI_PROVIDER_IDS.map(id => [id, {
       baseUrl: settings.profiles[id].baseUrl,
       model: settings.profiles[id].model,
     }])),

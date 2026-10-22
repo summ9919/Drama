@@ -241,6 +241,7 @@ test('front/back renders preserve CameraView identity and disable controls durin
     '../../store/captureStore': { useCaptureStore: selector => selector({ savedUris: [] }) },
     '../../hooks/useCameraGuidance': { useCameraGuidance: () => guide },
     './CameraGuidanceControls': { CameraGuidanceControls: 'GuidanceControls' },
+    './CameraParameterPanel': { CameraParameterPanel: 'ParameterPanel' },
     './CameraDirectionOverlay': { CameraDirectionOverlay: 'DirectionOverlay' },
     './CameraReadyEffects': { CameraReadyFrame: 'ReadyFrame', CameraReadyNotice: 'ReadyNotice', CameraShutterHalo: 'ShutterHalo' },
   });
@@ -256,6 +257,9 @@ test('front/back renders preserve CameraView identity and disable controls durin
   }
   const props = { cameraRef: { current: null } };
   const backTree = CameraCapture(props);
+  assert.equal(find(backTree, node => node.props.accessibilityLabel === '微调相机参数').node.props.disabled, false);
+  const titleRow = find(backTree, node => React.Children.toArray(node.props.children).some(child => React.isValidElement(child) && child.props.children === '相机实时参数'));
+  assert.equal(find(titleRow.node, node => node.props.name === 'checkmark-circle'), null);
   const back = find(backTree, node => node.type === 'NativeCamera');
   guide = { ...guide, ready: false, switching: true, context: { facing: 'front', zoom: 0 } };
   const frontTree = CameraCapture(props);
@@ -269,6 +273,56 @@ test('front/back renders preserve CameraView identity and disable controls durin
   for (const label of ['切换前后镜头', '拍照']) {
     assert.equal(find(frontTree, node => node.props.accessibilityLabel === label).node.props.disabled, true);
   }
+});
+
+test('manual zoom and flash stop stale AI plans without sending another request', async () => {
+  let requests = 0;
+  const s = session({ analyze: async () => { requests++; return advice; } });
+  s.render().cameraReady(); await s.render().toggleGuidance(); await s.advance(350);
+  assert.equal(requests, 1);
+  await s.render().adjustParameters({ zoom: 0.5 });
+  assert.equal(s.render().enabled, false);
+  assert.equal(s.render().result, null);
+  assert.equal(s.render().context.zoom, 0.5);
+  await s.render().adjustParameters({ flash: 'auto' });
+  assert.equal(s.render().context.flash, 'auto');
+  await s.advance(60000);
+  assert.equal(requests, 1);
+  s.unmount();
+});
+
+test('manual hardware tuning preserves other parameters, blocks concurrent actions and only updates on success', async () => {
+  let fail = false, pending = null;
+  const commands = [];
+  const caps = { native: true, cameraId: 'back-test', apertures: [1.5, 2.4], contrast: true, whiteBalance: ['auto', 'daylight'] };
+  const s = session({ tuning: {
+    capabilities: async () => caps, reset: async () => {},
+    apply: async (...args) => { commands.push(args); if (pending) await pending.promise; if (fail) throw new Error('device failed'); },
+  } });
+  s.render().cameraReady(); await flush();
+  assert.equal(s.render().context.capabilities.cameraId, caps.cameraId);
+  await s.render().adjustParameters({ whiteBalance: 'daylight' });
+  assert.equal(s.render().appliedTuning.whiteBalance, 'daylight');
+  pending = deferred();
+  const work = s.render().adjustParameters({ contrast: 1.2 });
+  await flush();
+  const last = commands.at(-1);
+  assert.equal(last[3], 1.2); assert.equal(last[4], 'daylight');
+  assert.equal(s.render().adjustingParameters, true);
+  await s.render().adjustParameters({ aperture: 2.4 });
+  s.render().flipCamera(); await s.render().capture();
+  assert.equal(s.render().context.facing, 'back'); assert.equal(s.shots(), 0);
+  pending.resolve(); await work; pending = null;
+  assert.equal(s.render().appliedTuning.contrast, 1.2);
+  assert.equal(s.render().adjustingParameters, false);
+  fail = true;
+  await s.render().adjustParameters({ contrast: 0.9 });
+  assert.equal(s.render().appliedTuning.contrast, 1.2);
+  assert.match(s.render().tuningMessage, /未能应用/);
+  const count = commands.length;
+  await s.render().adjustParameters({ contrast: 2 });
+  assert.equal(commands.length, count, 'invalid range must never reach the device');
+  s.unmount();
 });
 
 test('ready advice settles locally and movement revokes the ready effect', async () => {

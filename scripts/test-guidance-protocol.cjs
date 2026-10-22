@@ -4,7 +4,7 @@ const React = require('react');
 const { loadModule } = require('./helpers/load-ts.cjs');
 const { GUIDANCE_SCHEMA, GUIDANCE_EXAMPLE } = loadModule('src/constants/guidanceProtocol.ts');
 const { parseGuidance } = loadModule('src/lib/guidanceRules.ts');
-const profile = { provider: 'kimi', apiKey: 'fake-test-key', baseUrl: 'https://vision.example.test/v1', model: 'test-vlm' };
+const profile = { provider: 'custom', apiKey: 'fake-test-key', baseUrl: 'https://vision.example.test/v1', model: 'test-vlm' };
 const context = { style: '清透', mode: '人像', facing: 'back', zoom: 0, flash: 'off' };
 const sample = { dataUrl: 'data:image/jpeg;base64,AA==', capturedAt: 0 };
 const example = JSON.parse(JSON.stringify(GUIDANCE_EXAMPLE));
@@ -79,6 +79,7 @@ test('vision HTTP request includes shared schema and real image, then valid para
       '../../hooks/useCameraGuidance': { useCameraGuidance: () => guide },
       './CameraDirectionOverlay': { CameraDirectionOverlay: 'DirectionOverlay' },
       './CameraGuidanceControls': { CameraGuidanceControls: 'GuidanceControls' },
+      './CameraParameterPanel': { CameraParameterPanel: 'ParameterPanel' },
       './CameraReadyEffects': { CameraReadyFrame: 'ReadyFrame', CameraReadyNotice: 'ReadyNotice', CameraShutterHalo: 'ShutterHalo' },
     });
     const visit = node => !React.isValidElement(node) ? [] : [node, ...React.Children.toArray(node.props.children).flatMap(visit)];

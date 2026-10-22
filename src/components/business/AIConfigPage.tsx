@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../constants/theme';
-import { AI_PROVIDERS } from '../../constants/ai';
+import { AI_PROVIDER_IDS, AI_PROVIDERS } from '../../constants/ai';
 import { useAIConfig } from '../../hooks/useAIConfig';
 
 export function AIConfigPage() {
@@ -40,16 +40,16 @@ export function AIConfigPage() {
 
         <Text style={styles.sectionLabel}>服务商</Text>
         <View style={styles.providers}>
-          {(['deepseek', 'kimi'] as const).map(id => (
+          {AI_PROVIDER_IDS.map(id => (
             <Pressable key={id} accessibilityRole="radio" accessibilityState={{ checked: provider === id, disabled }}
               disabled={disabled} onPress={() => { selectProvider(id); setShowKey(false); }}
-              style={[styles.provider, provider === id && styles.providerSelected]}>
+              style={[styles.provider, id === 'custom' && styles.customProvider, provider === id && styles.providerSelected]}>
               <View style={styles.providerTop}>
                 <Text style={styles.providerName}>{AI_PROVIDERS[id].name}</Text>
                 <Ionicons name={provider === id ? 'checkmark-circle' : 'ellipse-outline'} size={20}
                   color={provider === id ? colors.primary : colors.line} />
               </View>
-              <Text style={styles.providerHint}>{id === 'deepseek' ? 'DeepSeek 开放平台' : '月之暗面 · 国内站'}</Text>
+              <Text style={styles.providerHint}>{AI_PROVIDERS[id].hint}</Text>
             </Pressable>
           ))}
         </View>
@@ -80,20 +80,24 @@ export function AIConfigPage() {
             <Text style={styles.label}>API 地址</Text>
             <TextInput accessibilityLabel="API 地址" value={profile.baseUrl} editable={!disabled}
               onChangeText={value => update('baseUrl', value)} autoCapitalize="none" autoCorrect={false}
-              keyboardType="url" placeholder={AI_PROVIDERS[provider].baseUrl} placeholderTextColor={colors.subtle} style={styles.input} />
-            <Text style={styles.help}>填写基础地址，无需添加 /chat/completions。请使用你信任的服务地址。</Text>
+              keyboardType="url" placeholder={provider === 'custom' ? 'https://your-api.example/v1' : AI_PROVIDERS[provider].baseUrl} placeholderTextColor={colors.subtle} style={styles.input} />
+            <Text style={styles.help}>{provider === 'custom'
+              ? '支持 OpenAI 兼容接口。填写 HTTPS 基础地址（保留服务要求的 /v1 等路径），无需添加 /chat/completions。'
+              : '填写基础地址，无需添加 /chat/completions。请使用你信任的服务地址。'}</Text>
 
             <Text style={styles.label}>模型名称</Text>
             <TextInput accessibilityLabel="模型名称" value={profile.model} editable={!disabled}
               onChangeText={value => update('model', value)} autoCapitalize="none" autoCorrect={false}
-              placeholder={AI_PROVIDERS[provider].model} placeholderTextColor={colors.subtle} style={styles.input} />
-            <Text style={styles.help}>默认填入支持图片的模型；可按账号开通情况修改。</Text>
-            <Pressable accessibilityRole="button" disabled={disabled} onPress={() => {
+              placeholder={provider === 'custom' ? '填写服务商提供的模型 ID' : AI_PROVIDERS[provider].model} placeholderTextColor={colors.subtle} style={styles.input} />
+            <Text style={styles.help}>{provider === 'custom'
+              ? '拍摄指导需要模型支持图片输入，且接口支持 JSON Schema 结构化输出。测试连接仅验证文本请求。'
+              : '默认填入支持图片的模型；可按账号开通情况修改。'}</Text>
+            {provider !== 'custom' && <Pressable accessibilityRole="button" disabled={disabled} onPress={() => {
               update('baseUrl', AI_PROVIDERS[provider].baseUrl);
               update('model', AI_PROVIDERS[provider].model);
             }} style={styles.textAction}>
               <Text style={styles.link}>恢复默认地址与模型</Text>
-            </Pressable>
+            </Pressable>}
           </View>
         )}
 
@@ -141,8 +145,9 @@ const styles = StyleSheet.create({
   headline: { fontSize: 23, fontWeight: '600', color: colors.ink },
   description: { fontSize: 13, lineHeight: 22, color: colors.muted, textAlign: 'center', marginTop: 10 },
   sectionLabel: { fontSize: 14, fontWeight: '600', color: colors.ink },
-  providers: { flexDirection: 'row', gap: 12, marginTop: 12, marginBottom: 24 },
+  providers: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 12, marginBottom: 24 },
   provider: { flex: 1, padding: 16, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.65)', backgroundColor: 'rgba(255, 255, 255, 0.22)' },
+  customProvider: { flexBasis: '100%' },
   providerSelected: { borderColor: colors.primary, backgroundColor: 'rgba(255, 255, 255, 0.55)' },
   providerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 6 },
   providerName: { fontSize: 17, fontWeight: '700', color: colors.ink },
