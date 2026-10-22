@@ -1,218 +1,218 @@
 <div align="center">
 
-<img src="assets/pony-icon.svg" alt="Drama 相机小马图标" width="160" />
+<img src="assets/pony-icon.svg" alt="Drama Camera Pony Icon" width="160" />
 
-# Drama 相机
+# Drama Camera
 
-### 把「怎么拍」变成看得见的下一步。
+### Turn "how to shoot" into visible next steps.
 
-用 AI 看懂当前画面，用虚线引导调整构图。<br />
-对准目标、稳住手机，等一句清晰的「可以拍照了」。
+AI understands your frame and guides your composition with directional dotted lines.<br />
+Align with your target, hold steady, and wait for a clear "Ready to Capture".
 
 ![Expo](https://img.shields.io/badge/Expo-52-18232B?style=flat-square&logo=expo)
 ![React Native](https://img.shields.io/badge/React_Native-0.76-597C90?style=flat-square&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Android first](https://img.shields.io/badge/Android-first-7D9C88?style=flat-square&logo=android&logoColor=white)
 
-[界面预览](#-界面预览) · [App 内使用](#-app-内使用) · [运行项目](#-运行项目)
+[UI Preview](#-ui-preview) · [In-App Usage](#-in-app-usage) · [Getting Started](#-getting-started)
 
 <p>
-  <b>简体中文</b> · <a href="README_EN.md">English</a>
+  <b>English</b> · <a href="README_ZH.md">简体中文</a>
 </p>
 
 </div>
 
 ---
 
-Drama 是一个基于 **Expo + React Native** 的 AI 摄影指导应用，优先面向 Android。选择拍摄模式与风格，将当前取景画面交给视觉模型；模型返回结构化方案，手机负责显示路线、执行支持的参数，并在本地判断是否完成调整。
+Drama is an AI photography guidance app built with **Expo + React Native**, targeting Android first. Select your shooting mode and aesthetic style, then send the current framing to a vision model; the model returns a structured plan, while your device displays the trajectory, tunes supported camera parameters, and verifies alignment locally.
 
-**一次请求，一步调整，本地完成。** 不持续上传视频，不按固定间隔轮询模型；需要新方案时，再点击「重新规划」。
+**One request, one-step guidance, completed locally.** No continuous video streaming, no periodic polling of the model; when a new composition is needed, simply tap "Replan".
 
 ---
 
-## 📸 界面预览
+## 📸 UI Preview
 
-### 功能演示
+### Feature Demo
 
 <div align="center">
-<img src="assets/drama-mobile-feature-banner.gif" alt="Drama 相机功能演示" width="640" />
-<p><sub>手机端功能演示 · 循环播放</sub></p>
+<img src="assets/drama-mobile-feature-banner.gif" alt="Drama Camera Feature Demo" width="640" />
+<p><sub>Mobile feature demo · Looping playback</sub></p>
 </div>
 
-### 核心页面
+### Core Screens
 
 <table>
   <tr>
-    <th align="center">🎥 拍摄首页</th>
-    <th align="center">⚙️ AI 配置</th>
-    <th align="center">👤 个人页面</th>
+    <th align="center">🎥 Camera Home</th>
+    <th align="center">⚙️ AI Configuration</th>
+    <th align="center">👤 Profile</th>
   </tr>
   <tr>
-    <td align="center"><img src="docs/images/home.jpg" alt="Drama 拍摄首页" width="260" /></td>
-    <td align="center"><img src="docs/images/ai-config.jpg" alt="AI 配置页面" width="260" /></td>
-    <td align="center"><img src="docs/images/profile.jpg" alt="个人页面" width="260" /></td>
+    <td align="center"><img src="docs/images/home.jpg" alt="Drama Camera Home" width="260" /></td>
+    <td align="center"><img src="docs/images/ai-config.jpg" alt="AI Configuration Screen" width="260" /></td>
+    <td align="center"><img src="docs/images/profile.jpg" alt="Profile Screen" width="260" /></td>
   </tr>
   <tr>
-    <td align="center"><sub>电影画质导引，探索光影灵感与开启相机</sub></td>
-    <td align="center"><sub>选择服务商（Kimi / DeepSeek），填写 API Key</sub></td>
-    <td align="center"><sub>创作者主页、拍摄统计与 AI 配置入口</sub></td>
+    <td align="center"><sub>Cinematic lighting guidance, explore presets & open camera</sub></td>
+    <td align="center"><sub>Select provider (Kimi / DeepSeek), enter API Key</sub></td>
+    <td align="center"><sub>Creator profile, shooting stats & AI settings entry</sub></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <th align="center">✨ 灵感广场</th>
-    <th align="center">🖼️ 拍摄相册</th>
+    <th align="center">✨ Inspiration Feed</th>
+    <th align="center">🖼️ Photo Album</th>
   </tr>
   <tr>
-    <td align="center"><img src="docs/images/inspiration.jpg" alt="Drama 灵感页面" width="260" /></td>
-    <td align="center"><img src="docs/images/album.jpg" alt="Drama 相册页面" width="260" /></td>
+    <td align="center"><img src="docs/images/inspiration.jpg" alt="Drama Inspiration Screen" width="260" /></td>
+    <td align="center"><img src="docs/images/album.jpg" alt="Drama Album Screen" width="260" /></td>
   </tr>
   <tr>
-    <td align="center"><sub>精选光影灵感与多场景构图预设</sub></td>
-    <td align="center"><sub>拍摄作品画廊、胶片参数与质感微调</sub></td>
+    <td align="center"><sub>Curated lighting inspirations & composition presets</sub></td>
+    <td align="center"><sub>Work gallery, film parameters & tone fine-tuning</sub></td>
   </tr>
 </table>
 
-> 截图来自当前代码的 Web 预览，使用移动端尺寸；未填写真实密钥。Android 的权限提示、系统栏和原生相机表现会有所不同。
+> Screenshots captured from Expo Web preview using mobile dimensions (390 × 844); no real API keys entered. Android system bars, permissions, and native camera behavior may differ.
 
-### 功能亮点
+### Key Highlights
 
-| 功能 | 使用体验 |
+| Feature | Experience |
 | :--- | :--- |
-| **看得见的移动路线** | 取景器显示中心点、虚线和目标圈，按提示调整手机，让中心点与目标圈重合。文字和操作控件位于取景框外。 |
-| **到位即提示可拍** | 位置满足要求、参数执行完成，并稳定约 **0.8 秒**后，显示绿色四角、呼吸光环、快门高亮和「可以拍照了」，辅以短振动。 |
-| **三种摄影模式** | 人像关注人物与背景关系；风景关注视觉中心、线条与层次；夜景关注现场光、亮暗关系与稳定。每种模式有独立提示词。 |
-| **四种审美偏好** | 清透、奶杏、薄荷、胶片参与 AI 构图建议；目前是提示词中的风格偏好，并非成片滤镜。 |
-| **按能力调节参数** | 支持数字变焦与闪光灯；Android 原生模块按设备能力调节白平衡预设、对比度。光圈和自动曝光由系统管理。 |
-| **使用自己的模型服务** | 在 App 内填写密钥、HTTPS 基础地址和模型名称，支持兼容 Chat Completions 的视觉接口。 |
-| **拍摄与保存** | 前后摄像头切换、拍摄预览、重拍和保存到系统相册。 |
+| **Visible Trajectory Lines** | The viewfinder shows the frame center, dotted path, and target circle. Follow instructions to align the center with the target circle. Control labels stay outside the preview frame. |
+| **Instant Ready Indicator** | When framing requirements and parameter tuning are met and held steady for ~**0.8s**, green framing corners, pulsing ring, shutter highlight, and "Ready to Capture" appear with haptic feedback. |
+| **3 Shooting Modes** | Portrait (subject-background harmony), Landscape (visual center, leading lines, depth), Night (ambient light, contrast, stability). Each mode uses dedicated prompts. |
+| **4 Aesthetic Styles** | Clear, Apricot, Mint, and Vintage Film participate in AI composition reasoning (currently prompt-based aesthetic preferences rather than post-processing filters). |
+| **Hardware-Adaptive Parameters** | Supports digital zoom and flashlight; custom Android native module adjusts white balance presets and contrast based on device capabilities. Aperture and auto-exposure remain managed by the system. |
+| **BYO Model Services** | Enter your API key, HTTPS base URL, and model name directly in the app. Supports Chat Completions compatible vision endpoints. |
+| **Capture & Save** | Flip between front and rear cameras, preview captured shots, retake, or save to system media gallery. |
 
-灵感、相册和个人页面也已包含在项目中；部分展示卡片与菜单仍是示例或占位内容。
+Inspiration, Album, and Profile screens are fully integrated into the app; some cards and settings menus remain demo mockups.
 
 ---
 
-## 📱 App 内使用
+## 📱 In-App Usage
 
-### 配置 API Key
+### Configuring API Key
 
-**不需要把密钥写进源码，也不需要创建 `.env`。** 当前版本从 App 内的「AI 配置」读取设置，手机直接请求你选择的 API 服务，仓库不包含独立后端。
+**No need to hardcode keys into source code or create `.env` files.** The app reads credentials directly from the in-app "AI Configuration" screen. The device sends requests directly to your chosen provider; there is no independent backend in this repo.
 
-#### 1. 准备支持图片输入的模型
+#### 1. Prepare a Vision-Capable Model
 
-在服务商的开放平台创建自己的 API Key，并确认账户有可用额度、所选模型已开通。聊天网页的会员订阅与 API 使用资格、额度不一定相同。
+Create your API Key in your provider's developer console, and ensure sufficient balance and model access. Note that consumer web chat subscriptions do not always grant API quota.
 
-| 配置项 | Kimi 示例 | DeepSeek 预设 |
+| Item | Kimi Example | DeepSeek Preset |
 | :--- | :--- | :--- |
-| 开放平台 | [Moonshot 开放平台](https://platform.moonshot.cn/) | [DeepSeek 开放平台](https://platform.deepseek.com/) |
-| API 地址 | `https://api.moonshot.cn/v1` | `https://api.deepseek.com` |
-| 模型名称 | `kimi-k3` | `deepseek-flash` |
-| API Key | 在对应平台创建的个人密钥 | 在对应平台创建的个人密钥 |
+| Platform | [Moonshot Open Platform](https://platform.moonshot.cn/) | [DeepSeek Open Platform](https://platform.deepseek.com/) |
+| API Base URL | `https://api.moonshot.cn/v1` | `https://api.deepseek.com` |
+| Model ID | `kimi-k3` | `deepseek-flash` |
+| API Key | Personal key from the provider | Personal key from the provider |
 
-以上地址与模型名对应项目当前预设，**不是模型可用性或服务质量保证**。请以自己的账号权限和服务商最新文档为准；换模型时必须确认支持 **图片输入 + JSON 输出**。Kimi 接入示例可参考[官方快速开始](https://platform.moonshot.cn/docs/guide/start-using-kimi-api)，DeepSeek 接入说明见[官方 API 文档](https://api-docs.deepseek.com/zh-cn/)。
+The above URLs and model IDs represent current project presets, **not guarantees of availability or service quality**. Please refer to your account permissions and official provider documentation. When switching models, verify that the model supports both **vision input + JSON output**. See the [Kimi Quickstart](https://platform.moonshot.cn/docs/guide/start-using-kimi-api) and [DeepSeek API Docs](https://api-docs.deepseek.com/).
 
-#### 2. 在 App 内填写
+#### 2. Enter Credentials in App
 
 <div align="center">
-<img src="docs/images/ai-config.jpg" alt="AI 配置页面" width="280" />
-<p><sub>AI 配置页面：选择服务商 → 填写密钥 → 测试连接 → 保存并选用</sub></p>
+<img src="docs/images/ai-config.jpg" alt="AI Configuration Screen" width="280" />
+<p><sub>AI Configuration: Select Provider → Enter Key → Test Connection → Save & Select</sub></p>
 </div>
 
-1. 打开底部 **「我的」→「AI 配置」**；也可以从取景器右上角进入配置。
-2. 选择 **Kimi** 或 **DeepSeek**，两个预设分别保存配置。
-3. 填写 **API Key**、**API 地址**、**模型名称**，具体格式见下表。
-4. 点击 **「测试连接」**，检查密钥、地址和模型是否能够响应。
-5. 点击 **「保存并选用」**，再返回相机开启 AI 指导。
+1. Open bottom tab **"Profile" → "AI Configuration"**; or access settings from the top-right of the viewfinder.
+2. Select **Kimi** or **DeepSeek**; configuration is saved independently for each provider.
+3. Fill in **API Key**, **API Base URL**, and **Model ID**.
+4. Tap **"Test Connection"** to verify that credentials and model respond.
+5. Tap **"Save & Select"**, then return to the camera to enable AI guidance.
 
-| 字段 | 如何填写 |
+| Field | Formatting Note |
 | :--- | :--- |
-| **API Key** | 粘贴完整密钥，不加 `Bearer` 前缀、引号或空格。 |
-| **API 地址** | 填写 HTTPS 基础地址，保留服务商要求的 `/v1` 等路径；无需添加 `/chat/completions`。 |
-| **模型名称** | 填写 API 模型 ID，必须与服务商文档一致。 |
+| **API Key** | Paste full key directly; do not add `Bearer` prefix, quotes, or extra spaces. |
+| **API URL** | Enter HTTPS base URL, keeping provider path prefixes like `/v1`; do not append `/chat/completions`. |
+| **Model ID** | Enter the exact model ID as documented by your provider. |
 
-> **连接测试只发送一条文本，不发送照片。** 测试通过不等于图片识别能力已验证；第一次在取景器开启指导，才会发送压缩画面。连接测试和画面分析都可能产生服务商调用费用。
+> **Connection testing sends a single text ping without images.** Passing the test does not verify vision capabilities; compressed frames are only transmitted when guidance is activated in the viewfinder for the first time. Both connection tests and image analyses may incur provider usage fees.
 
-#### 3. 使用自建或其他兼容接口
+#### 3. Custom & Third-Party Compatible Endpoints
 
-可以在任一预设下修改 API 地址、模型和密钥。自建服务需要提供：
+You can customize the API URL, model, and key under any preset. Self-hosted services must meet:
 
-- HTTPS 的 `POST {基础地址}/chat/completions`，使用 Bearer Token 鉴权。
-- 支持 `messages` 中的 `image_url`，包括 Base64 Data URL 图片。
-- 支持 `response_format: { type: "json_schema", json_schema: { ..., strict: true } }`。
-- 在 `choices[0].message.content` 中返回符合本项目 [JSON v3 Schema](docs/camera-guidance-v3.schema.json) 的 JSON 字符串。
+- HTTPS `POST {baseURL}/chat/completions` with Bearer token authentication.
+- Support for `image_url` within `messages`, including Base64 Data URLs.
+- Support for `response_format: { type: "json_schema", json_schema: { ..., strict: true } }`.
+- Return a JSON string adhering to the project's [JSON v3 Schema](docs/camera-guidance-v3.schema.json) in `choices[0].message.content`.
 
-当前适配对官方 DeepSeek / Moonshot 域名使用 `json_object`，其他域名使用严格 `json_schema`。所有返回值还会经过 TypeScript 字段与语义校验；缺字段、多余字段、越界参数或 Markdown 代码块都会被拒绝，不能直接接入任意文本聊天接口。
+Official DeepSeek / Moonshot domains use `json_object`, while custom domains use strict `json_schema`. All responses undergo strict TypeScript field and semantic validation; missing fields, extra fields, out-of-bounds parameters, or markdown code fences are rejected.
 
-#### 密钥和照片如何处理
+#### Credential and Image Privacy
 
-- **Android / iOS：** 密钥保存在本机 `expo-secure-store` 中；配置页可删除对应服务商的本地密钥。
-- **Web：** 密钥仅保留在当前页面会话内存，刷新或关闭后需要重新填写。
-- **分析时：** 压缩画面、模式、风格和设备能力等上下文会发送到你配置的服务地址。请使用自己信任的服务。
-- **取样照片：** 指导样本不写入系统相册；最终照片需由你点击保存。
+- **Android / iOS:** Keys are stored locally using `expo-secure-store`; you can delete local keys in settings.
+- **Web:** Keys are held in session memory only and reset upon refresh.
+- **Analysis:** Compressed frame, mode, style, and device capability context are sent directly to your configured provider. Please use trusted services.
+- **Photo Samples:** Guidance frames are not written to the system photo library; final shots are saved only when you tap Save.
 
-不要将真实密钥放入源码、截图、Issue 或提交记录。若要给所有用户提供统一服务，应另行设计自己的服务端鉴权与额度管理，不能把公共密钥打进 APK。
+Never commit real API keys into code, screenshots, issues, or git commits.
 
-### 第一次拍摄
+### First Shoot
 
 ```mermaid
 flowchart LR
-    A[选择模式与风格] --> B[提交画面 · AI 分析一次]
-    B --> C[虚线路线 · 本地参数调整]
-    C --> D[对准目标 · 稳定 0.8 秒]
-    D --> E[✦ 可以拍照了]
+    A[Select Mode & Style] --> B[Submit Frame · AI Analyzes Once]
+    B --> C[Dotted Trajectory · Local Param Tuning]
+    C --> D[Align Target · Hold Steady 0.8s]
+    D --> E[✦ Ready to Capture]
     style B fill:#EDF3F6,stroke:#7D9AAC,color:#25343D
     style E fill:#DDF5E9,stroke:#69A68C,color:#203F35
 ```
 
 <div align="center">
-<img src="docs/images/home.jpg" alt="拍摄首页" width="280" />
-<p><sub>拍摄首页：浏览光影与风格预设，点击「开启相机」进入取景器</sub></p>
+<img src="docs/images/home.jpg" alt="Camera Home Screen" width="280" />
+<p><sub>Camera Home: Explore lighting and style presets, tap "Open Camera" to enter viewfinder</sub></p>
 </div>
 
-1. 允许相机权限，进入取景器，选择人像、风景或夜景。
-2. 开启 AI 指导，等待本轮分析；跟随虚线调整手机。
-3. App 执行设备支持的参数。关闭自动变焦时，需要自己调到目标倍率。
-4. 中心点进入目标圈并稳定后，直接出现可拍特效，**不会再请求一次模型复核**。
-5. 按下快门，预览照片并保存；保存时需要相册权限。
+1. Grant camera permission, enter the viewfinder, and choose Portrait, Landscape, or Night mode.
+2. Enable AI guidance, wait for the analysis, and follow the dotted trajectory to adjust phone position.
+3. The app executes device-supported parameters. If auto-zoom is off, manually adjust to the target focal length.
+4. Once the center crosshair enters the target circle and remains steady, the capture indicator appears immediately **without requiring a second model roundtrip**.
+5. Press the shutter button, preview the photo, and save it to your photo album.
 
-纯平移、前后距离或无法使用传感器时，按照提示调整后点击 **「已调整，确认到位」**。设备的转动传感器不能可靠测量移动了多少厘米。
+For pure lateral translation, forward/backward distance, or when rotation sensors are unavailable, adjust as instructed and tap **"Adjusted, Confirm in Position"**. Device gyro/rotation sensors cannot reliably measure translational displacement in centimeters.
 
-明显移动会撤回可拍提示；可传感器验证的路线重新对准后，可在本地恢复。更换模式、风格、镜头或点击「重新规划」会重新生成方案。错误、超时或未完成移动时不会自动循环请求。
+Noticeable movements revoke the ready state; sensor-tracked trajectories recover locally once realigned. Changing mode, style, lens, or tapping "Replan" triggers a fresh plan. Guidance does not loop automatically upon errors, timeouts, or incomplete movement.
 
 ---
 
-## 🛠 运行项目
+## 🛠 Getting Started
 
-以下命令均在 **包含 `package.json` 的目录**执行。当前 Git 仓库根目录就是该目录；如果下载后的外层还有 `frontend/`，先进入它。
+Run all commands in the directory containing `package.json`. If cloned inside an outer directory, enter `frontend/` first.
 
-### 环境准备与启动
+### Environment & Startup
 
-准备 Node.js LTS、npm 和 Git，然后安装锁定版本的依赖：
+Ensure Node.js LTS, npm, and Git are installed, then install locked dependencies:
 
 ```bash
 npm ci
 npm start
 ```
 
-使用 Web 查看界面：
+Web preview:
 
 ```bash
 npm run web
 ```
 
-使用安装了 Android SDK / JDK 的本地环境编译并运行 Android 原生包：
+Compile and run Android native build locally (requires Android SDK / JDK):
 
 ```bash
 npx expo run:android
 ```
 
-> 项目包含本地原生模块 `modules/camera-tuning`。**白平衡、对比度等原生能力需要重新编译 Android 包，Expo Go 和旧 APK 无法通过更新 JS 获得这些能力。** Web 适合界面预览，不能替代 Android 真机验收；浏览器调用 API 还可能受到 CORS 限制。
+> The project includes a custom native module `modules/camera-tuning`. **Native features like white balance and contrast tuning require compiling an Android build; Expo Go cannot execute native tuning modules.** Web preview is suitable for UI inspection but cannot replace Android device testing; browser API requests may also encounter CORS limitations.
 
-### 构建 Android APK
+### Building Android APK
 
-项目已提供 [EAS Build 配置](eas.json)：`preview` 生成可安装的 APK，`production` 生成商店使用的 AAB。
+Configured via [EAS Build](eas.json): `preview` generates an installable APK, and `production` builds an AAB for app store releases.
 
-首次使用自己的 Expo 账号构建时，先修改 [app.json](app.json)：将 `expo.owner` 改为自己的账号或组织，移除原项目的 `expo.extra.eas.projectId`，再运行 `eas init` 关联自己的 EAS 项目。独立发布时也应设置自己的 `expo.android.package`（以及 iOS 的 `bundleIdentifier`）。
+When building for the first time with your own Expo account, update [app.json](app.json): set `expo.owner` to your account or organization, remove `expo.extra.eas.projectId`, and run `eas init` to link your EAS project. Also configure your own `expo.android.package` (and iOS `bundleIdentifier`).
 
 ```bash
 npx eas-cli@latest login
@@ -220,89 +220,89 @@ npx eas-cli@latest init
 npx eas-cli@latest build --platform android --profile preview
 ```
 
-构建结束后，从 EAS 输出链接下载并安装 APK。API Key 在安装后由使用者自行填写，**不作为构建环境变量嵌入应用**。
+Download and install the APK from the EAS build output link. API keys are filled by users after installation and **not baked into application binaries**.
 
-需要 AAB 时：
+For AAB store builds:
 
 ```bash
 npx eas-cli@latest build --platform android --profile production
 ```
 
-### 开发导航
+### Directory Structure
 
 ```text
 .
-├── src/app/                    # Expo Router 页面和导航
-├── src/components/business/    # 取景器、引导叠层、可拍特效、AI 配置
-├── src/constants/              # 摄影提示词、JSON Schema、主题、服务商预设
-├── src/hooks/                  # 相机流程、AI 请求和本地引导状态
-├── src/lib/                    # API 客户端、JSON 校验、参数执行与安全存储
-├── modules/camera-tuning/      # Android 相机参数原生模块
-├── docs/                       # 协议、摄影依据和界面截图
-└── scripts/                    # 回归测试与 Schema 导出
+├── src/app/                    # Expo Router pages and navigation
+├── src/components/business/    # Viewfinder, guidance overlay, capture effects, AI config
+├── src/constants/              # Photography prompts, JSON schema, theme, provider presets
+├── src/hooks/                  # Camera flow, AI requests, and local guidance state
+├── src/lib/                    # API client, JSON validation, param execution, secure storage
+├── modules/camera-tuning/      # Android native camera parameter tuning module
+├── docs/                       # Protocols, photography design rationale, screenshots
+└── scripts/                    # Regression tests and schema export
 ```
 
-| 想改什么 | 从哪里开始 |
+| Area | Entry Point |
 | :--- | :--- |
-| 不同摄影模式的审美要求 | [photographyPrompts.ts](src/constants/photographyPrompts.ts) · [摄影资料与设计依据](docs/photography-prompts.md) |
-| 模型返回格式与执行规则 | [通用提示词](src/constants/guidance.ts) · [JSON 协议说明](docs/camera-guidance-protocol.md) |
-| 默认服务商与模型 | [ai.ts](src/constants/ai.ts) |
-| 请求、超时与接口兼容 | [aiClient.ts](src/lib/aiClient.ts) |
-| 虚线、目标圈与可拍特效 | [CameraDirectionOverlay.tsx](src/components/business/CameraDirectionOverlay.tsx) · [CameraReadyEffects.tsx](src/components/business/CameraReadyEffects.tsx) |
+| Aesthetic guidelines by mode | [photographyPrompts.ts](src/constants/photographyPrompts.ts) · [Design Rationale](docs/photography-prompts.md) |
+| Model return schema & execution rules | [Common Prompts](src/constants/guidance.ts) · [Protocol Docs](docs/camera-guidance-protocol.md) |
+| Default providers & models | [ai.ts](src/constants/ai.ts) |
+| Requests, timeouts & compatibility | [aiClient.ts](src/lib/aiClient.ts) |
+| Trajectory, target circle & effects | [CameraDirectionOverlay.tsx](src/components/business/CameraDirectionOverlay.tsx) · [CameraReadyEffects.tsx](src/components/business/CameraReadyEffects.tsx) |
 
-### 测试
+### Testing
 
-类型检查和回归测试：
+Run type checks and regression tests:
 
 ```bash
 npx tsc --noEmit
 node --test scripts/test-ai-config.cjs scripts/test-camera-guidance.cjs scripts/test-camera-switch.cjs scripts/test-composition-target.cjs scripts/test-guidance-protocol.cjs scripts/test-guidance-execution.cjs scripts/test-camera-tuning.cjs
 ```
 
-测试使用模拟响应，不需要真实密钥。原生参数、镜头切换和实际模型表现仍需真机验证，详见[测试与验收清单](scripts/README.md)。
+Tests run with mocked responses and require no live API keys. Real hardware parameters, lens switches, and real model performance require physical device verification; see [Test & Verification Checklist](scripts/README.md).
 
-### 常见问题
+### FAQ
 
 <details>
-<summary><b>连接测试成功，为什么相机里还是没有指导？</b></summary>
+<summary><b>Connection test succeeds, but no guidance in camera?</b></summary>
 
-文本请求成功只能证明基础连接可用。检查模型是否支持图片输入、JSON 输出，账号是否开放相应权限；自建接口还需支持严格 JSON Schema。错误提示会显示在取景框外，修正配置后点击「重新规划」。
+A successful text ping only confirms connectivity. Ensure your model supports vision input and JSON output, and that your account has appropriate privileges. Self-hosted endpoints must support strict JSON schema. Error messages appear outside the viewfinder; correct settings and tap "Replan".
 
 </details>
 
 <details>
-<summary><b>请求超时，或者遇到 401 / 404 / 429？</b></summary>
+<summary><b>Requests timing out, or receiving 401 / 404 / 429 errors?</b></summary>
 
-当前请求超时为 45 秒。检查网络，或选择响应更快的视觉模型；应用不会自动重试。
+Default request timeout is 45 seconds. Check network quality or switch to a faster vision model; requests do not auto-retry.
 
-- **401：** 密钥无效、过期，或与服务商不匹配。
-- **403：** 账号没有对应权限。
-- **404：** 基础地址或模型 ID 不正确。
-- **402 / 429：** 检查余额、额度及调用频率。
-- **400 / 422：** 检查图片输入、JSON 模式和 Schema 支持。
+- **401:** Key is invalid, expired, or does not match provider.
+- **403:** Account lacks permissions for the requested model.
+- **404:** Base URL or model ID incorrect.
+- **402 / 429:** Check balance, quota, or rate limits.
+- **400 / 422:** Check vision input format, JSON mode, and Schema compliance.
 
-Web 上的网络错误也可能来自服务商跨域限制。
-
-</details>
-
-<details>
-<summary><b>为什么不能自动调光圈、ISO 和快门？</b></summary>
-
-当前实现保留系统自动曝光与光圈管理，未开放手动 ISO、快门。白平衡预设和对比度只在 Android 原生模块及设备都支持时执行，不支持的参数不会假装设置成功。夜景模式提供拍摄建议，不代表实现了原生多帧夜景算法。
+Web network errors may also stem from provider CORS restrictions.
 
 </details>
 
 <details>
-<summary><b>「可以拍照了」是否表示模型再次确认了画面？</b></summary>
+<summary><b>Why not automatically tune aperture, ISO, and shutter speed?</b></summary>
 
-它表示本轮方案的本地动作和参数条件已经完成。模型不会二次复核；主体自行移动、光线变化、长时间漂移等变化不一定能通过转动传感器发现。画面明显变化时，请主动重新规划。
+Auto-exposure and aperture are managed natively by the OS camera subsystem. White balance presets and contrast adjustments are only applied when supported by both the native module and device hardware; unsupported parameters are not falsified as successful. Night mode offers framing and lighting advice rather than native multi-frame night algorithms.
 
 </details>
 
 <details>
-<summary><b>支持 iOS、Web 和离线 AI 吗？</b></summary>
+<summary><b>Does "Ready to Capture" mean the model re-verified the frame?</b></summary>
 
-React Native 页面包含 iOS / Web 适配，但当前相机参数原生模块仅实现 Android，尚需原生编译与真机验收。Web 不提供相同的传感器引导能力。AI 分析需要联网调用配置的服务；拿到方案后，本轮位置引导和完成判定在本地进行。项目没有内置手机 NPU 大模型。
+It indicates that the local trajectory and parameter conditions from the current plan have been satisfied. The model does not perform a second verification pass; subject movement, light shifts, and gradual drift may not register on gyro sensors. When the scene changes visibly, please trigger a replan manually.
+
+</details>
+
+<details>
+<summary><b>Are iOS, Web, and offline AI models supported?</b></summary>
+
+React Native pages adapt to iOS and Web, but the camera tuning native module currently targets Android and requires native compilation and testing. Web preview does not offer sensor-based guidance. AI analysis requires internet access to call your chosen service; once a plan is received, guidance and completion detection run locally. The app does not embed an on-device NPU LLM.
 
 </details>
 
@@ -310,7 +310,7 @@ React Native 页面包含 iOS / Web 适配，但当前相机参数原生模块�
 
 <div align="center">
 
-**少一点猜测，多一点好照片。**<br />
-Drama 相机 · 让每一次按下快门，都更有把握。
+**Less guesswork, better photographs.**<br />
+Drama Camera · Confidence in every shutter press.
 
 </div>
