@@ -13,10 +13,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, shadows } from '../../constants/theme';
-import { sampleAlbum } from '../../constants/data';
 import { PageHeader } from '../ui/PageHeader';
 import { useCaptureStore } from '../../store/captureStore';
-import type { InspirationItem } from '../../types';
+import { getAlbumImages, type AlbumItem } from '../../lib/album';
 
 type Props = { capturedUri: string | null; savedUris: string[] };
 
@@ -28,40 +27,21 @@ type FilterItem = {
 
 const filters: FilterItem[] = [
   { key: '全部', label: '全部照片', icon: 'sparkles-outline' },
-  { key: '人像', label: '人像胶片', icon: 'person-outline' },
-  { key: '风景', label: '风景影像', icon: 'leaf-outline' },
   { key: '收藏', label: '我的收藏', icon: 'heart-outline' },
 ];
 
-const SCORES = [9.8, 9.4, 9.6, 9.1, 9.5, 9.3];
-
-const scoreFor = (index: number) => SCORES[index % SCORES.length];
-
 export function AlbumPage({ capturedUri, savedUris }: Props) {
   const [selectedFilter, setSelectedFilter] = useState('全部');
-  const [previewItem, setPreviewItem] = useState<InspirationItem | null>(null);
+  const [previewItem, setPreviewItem] = useState<AlbumItem | null>(null);
   const favoriteUris = useCaptureStore((state) => state.favoriteUris) || [];
   const toggleFavorite = useCaptureStore((state) => state.toggleFavorite);
 
-  const localImages: InspirationItem[] = [
-    ...savedUris,
-    ...(capturedUri ? [capturedUri] : []),
-  ].map((uri) => ({ uri, title: '我的作品', tag: '本地作品' }));
-  const images = localImages.length ? localImages : sampleAlbum;
+  const images = getAlbumImages(capturedUri, savedUris);
 
   const filteredImages = images.filter((item) => {
     if (selectedFilter === '全部') return true;
     if (selectedFilter === '收藏') {
       return favoriteUris.includes(item.uri);
-    }
-    if (selectedFilter === '人像') {
-      return (item.tag && item.tag.includes('人像')) || (item.title && item.title.includes('人像'));
-    }
-    if (selectedFilter === '风景') {
-      return (
-        (item.tag && (item.tag.includes('风景') || item.tag.includes('自然') || item.tag.includes('夜景'))) ||
-        (item.title && (item.title.includes('风景') || item.title.includes('自然') || item.title.includes('黄昏') || item.title.includes('日落')))
-      );
     }
     return true;
   });
@@ -120,26 +100,23 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
               />
             </View>
             <Text style={styles.emptyTitle}>
-              {selectedFilter === '收藏' ? '暂无收藏影像' : '暂无相关照片'}
+              {selectedFilter === '收藏' ? '暂无收藏影像' : '还没有拍摄照片'}
             </Text>
             <Text style={styles.emptySubtitle}>
               {selectedFilter === '收藏'
                 ? '点击照片上的小爱心，即可收藏喜欢的照片'
-                : '切换其他分类或开始拍摄记录美好瞬间'}
+                : '用相机拍下第一张照片，它就会出现在这里。保存后，下次打开仍可查看。'}
             </Text>
           </View>
         ) : (
           <>
-            {/* ── 今日最佳作品 ── */}
+            {/* ── 最近拍摄 ── */}
             {heroItem && (
               <View style={styles.heroSection}>
                 <View style={styles.sectionTitleRow}>
                   <View style={styles.sectionTitleLeft}>
-                    <Ionicons name="star" size={19} color={colors.secondary} />
-                    <Text style={styles.sectionTitle}>今日最佳作品</Text>
-                  </View>
-                  <View style={styles.scorePill}>
-                    <Text style={styles.scorePillText}>Score: {scoreFor(0)} 卓越</Text>
+                    <Ionicons name="camera-outline" size={19} color={colors.secondary} />
+                    <Text style={styles.sectionTitle}>最近拍摄</Text>
                   </View>
                 </View>
 
@@ -159,17 +136,6 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
                     style={StyleSheet.absoluteFill}
                     pointerEvents="none"
                   />
-
-                  <View style={styles.heroBadges}>
-                    <View style={styles.glassBadge}>
-                      <View style={styles.badgeDot} />
-                      <Text style={styles.glassBadgeText}>构图评分: {scoreFor(0)}</Text>
-                    </View>
-                    <View style={styles.glassBadge}>
-                      <Ionicons name="sunny-outline" size={13} color={colors.secondary} />
-                      <Text style={styles.glassBadgeText}>光影平衡: A+</Text>
-                    </View>
-                  </View>
 
                   <Pressable
                     accessibilityRole="button"
@@ -196,20 +162,9 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
                       <View style={styles.heroMetaText}>
                         <Text style={styles.heroTitle} numberOfLines={1}>{heroItem.title}</Text>
                         <Text style={styles.heroSubtitle} numberOfLines={1}>
-                          {heroItem.tag ?? '35mm · 人像'}
+                          {heroItem.tag}
                         </Text>
                       </View>
-                      <View style={styles.tunePill}>
-                        <Ionicons name="options-outline" size={14} color={colors.onSecondaryContainer} />
-                        <Text style={styles.tunePillText}>微调</Text>
-                      </View>
-                    </View>
-                    <View style={styles.heroExifRow}>
-                      {['ƒ/2.0', '1/320s', 'ISO 80'].map((value) => (
-                        <View key={value} style={styles.exifChip}>
-                          <Text style={styles.exifText}>{value}</Text>
-                        </View>
-                      ))}
                     </View>
                   </View>
                 </Pressable>
@@ -221,18 +176,13 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
               <View style={styles.galleryHeader}>
                 <View style={styles.galleryTitleRow}>
                   <Text style={styles.galleryTitle}>时光画廊</Text>
-                  <Text style={styles.galleryCount}>共 {filteredImages.length} 张原图</Text>
-                </View>
-                <View style={styles.gallerySort}>
-                  <Text style={styles.gallerySortText}>按周聚类</Text>
-                  <Ionicons name="chevron-down" size={15} color={colors.onSurfaceVariant} />
+                  <Text style={styles.galleryCount}>共 {filteredImages.length} 张照片</Text>
                 </View>
               </View>
 
               <View style={styles.grid}>
                 {galleryImages.map((item, index) => {
                   const isFav = favoriteUris.includes(item.uri);
-                  const score = scoreFor(index + 1);
                   return (
                     <Pressable
                       key={`${item.uri}-${index}`}
@@ -251,10 +201,6 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
                           style={styles.gridGradient}
                           pointerEvents="none"
                         />
-
-                        <View style={styles.scoreChip}>
-                          <Text style={styles.scoreChipText}>{score}</Text>
-                        </View>
 
                         <Pressable
                           accessibilityRole="button"
@@ -279,21 +225,18 @@ export function AlbumPage({ capturedUri, savedUris }: Props) {
 
                         <View style={styles.tagChip}>
                           <Ionicons
-                            name={index % 2 === 0 ? 'camera-outline' : 'crop-outline'}
+                            name="camera-outline"
                             size={11}
                             color={colors.secondary}
                           />
                           <Text style={styles.tagChipText} numberOfLines={1}>
-                            {item.tag ?? 'AI 辅助构图'}
+                            {item.tag}
                           </Text>
                         </View>
                       </View>
 
                       <View style={styles.gridMeta}>
                         <Text style={styles.gridTitle} numberOfLines={1}>{item.title}</Text>
-                        <Text style={styles.gridSubtitle} numberOfLines={1}>
-                          {index % 3 === 0 ? '50mm · 微距' : index % 3 === 1 ? '16mm · 超广' : '28mm · 夜景'}
-                        </Text>
                       </View>
                     </Pressable>
                   );
@@ -451,18 +394,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: -0.1,
   },
-  scorePill: {
-    backgroundColor: 'rgba(255, 224, 142, 0.5)',
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  scorePillText: {
-    color: colors.secondary,
-    fontSize: 11,
-    fontWeight: '500',
-    letterSpacing: 0.3,
-  },
   heroCard: {
     height: 340,
     borderRadius: 24,
@@ -474,37 +405,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-  },
-  heroBadges: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    maxWidth: '82%',
-  },
-  glassBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: 'rgba(251, 249, 246, 0.86)',
-    ...shadows.glassSm,
-  },
-  badgeDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: colors.secondary,
-  },
-  glassBadgeText: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.2,
   },
   heroHeart: {
     position: 'absolute',
@@ -547,38 +447,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.5,
   },
-  tunePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: colors.secondaryFixed,
-    ...shadows.glassSm,
-  },
-  tunePillText: {
-    color: colors.onSecondaryContainer,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
-  heroExifRow: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  exifChip: {
-    borderRadius: 5,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    backgroundColor: 'rgba(0, 0, 0, 0.38)',
-  },
-  exifText: {
-    color: 'rgba(234, 232, 229, 0.95)',
-    fontSize: 10.5,
-    fontWeight: '500',
-    letterSpacing: 0.5,
-  },
 
   /* ── gallery ── */
   gallerySection: {
@@ -607,17 +475,6 @@ const styles = StyleSheet.create({
     color: colors.onSurfaceVariant,
     fontSize: 12,
     fontWeight: '400',
-  },
-  gallerySort: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  gallerySortText: {
-    color: colors.onSurfaceVariant,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.35,
   },
   grid: {
     flexDirection: 'row',
@@ -649,21 +506,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: '42%',
-  },
-  scoreChip: {
-    position: 'absolute',
-    top: 7,
-    right: 7,
-    backgroundColor: 'rgba(24, 22, 18, 0.42)',
-    borderRadius: 5,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  scoreChipText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 0.5,
   },
   gridHeart: {
     position: 'absolute',
@@ -708,12 +550,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     letterSpacing: 0.3,
-  },
-  gridSubtitle: {
-    color: colors.onSurfaceVariant,
-    fontSize: 10.5,
-    fontWeight: '500',
-    letterSpacing: 0.5,
   },
 
   /* ── empty ── */

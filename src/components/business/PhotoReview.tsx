@@ -13,7 +13,7 @@ export function PhotoReview({ uri, onRetake, onSave, saving }: Props) {
   return (
     <View style={styles.page}>
       <View style={styles.header}>
-        <IconButton icon="chevron-back" onPress={onRetake} />
+        <IconButton icon="chevron-back" onPress={saving ? undefined : onRetake} />
         <Text style={styles.headerTitle}>拍摄完成</Text>
         <IconButton icon="ellipsis-horizontal" onPress={() => undefined} />
       </View>
@@ -65,7 +65,7 @@ export function PhotoReview({ uri, onRetake, onSave, saving }: Props) {
               </View>
             </View>
 
-            <Text style={styles.note}>查看画面细节，满意后保存到相册，也可以重拍一次。</Text>
+            <Text style={styles.note}>保存到相册后将自动继续拍摄，也可以重拍一次。</Text>
 
             <View style={styles.actions}>
               {/* 重拍：雾态玻璃按钮 */}
@@ -73,6 +73,7 @@ export function PhotoReview({ uri, onRetake, onSave, saving }: Props) {
                 <PrimaryButton
                   label="重拍"
                   onPress={onRetake}
+                  disabled={saving}
                   variant="glass"
                   compact
                   icon="refresh-outline"

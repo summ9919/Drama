@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CameraHome } from '../../components/business/CameraHome';
@@ -12,10 +12,11 @@ export default function CameraRoute() {
   const router = useRouter();
   const camera = useCameraFlow();
   const capturedUri = useCaptureStore((state) => state.capturedUri);
-  const setCapturedUri = useCaptureStore((state) => state.setCapturedUri);
   const clearCapturedUri = useCaptureStore((state) => state.clearCapturedUri);
   const addSavedUri = useCaptureStore((state) => state.addSavedUri);
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const savedPhotoRef = useRef<{ source: string; uri: string } | null>(null);
 
   const openCamera = async () => {
     const granted = await camera.open();
@@ -23,26 +24,41 @@ export default function CameraRoute() {
   };
 
   const retake = async () => {
+    if (savingRef.current) return;
     clearCapturedUri();
     const granted = await camera.open();
     if (granted) router.push('/capture');
   };
 
   const save = async () => {
-    if (!capturedUri) return;
+    if (!capturedUri || savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     try {
-      const result = await saveImageToLibrary(capturedUri);
+      const result = savedPhotoRef.current?.source === capturedUri
+        ? { saved: true as const, uri: savedPhotoRef.current.uri }
+        : await saveImageToLibrary(capturedUri);
       if (!result.saved) {
         Alert.alert('需要相册权限', '请允许Drama相机访问相册，以便保存你的作品。');
         return;
       }
-      addSavedUri(capturedUri);
-      Alert.alert('已保存', '这张照片已经回到你的相册了。', [{ text: '去相册', onPress: () => router.navigate('/album') }, { text: '继续拍摄' }]);
+      // Retain a successful file save across record-write retries without duplicating it.
+      savedPhotoRef.current = { source: capturedUri, uri: result.uri };
+      await addSavedUri(result.uri);
+      clearCapturedUri();
+      try {
+        const granted = await camera.open();
+        if (granted) router.push('/capture');
+        else Alert.alert('照片已保存', '允许相机权限后即可继续拍摄。');
+      } catch {
+        Alert.alert('照片已保存', '暂时无法打开相机，请重新打开拍摄。');
+      }
     } catch {
-      Alert.alert('保存失败', '请稍后再试。');
+      Alert.alert('保存失败', '照片仍保留在预览中，请检查存储空间后重试。');
+      return;
     } finally {
       setSaving(false);
+      savingRef.current = false;
     }
   };
 

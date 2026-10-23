@@ -5,11 +5,16 @@
 ```powershell
 node --test scripts/test-ai-config.cjs scripts/test-camera-guidance.cjs scripts/test-camera-switch.cjs scripts/test-composition-target.cjs scripts/test-guidance-protocol.cjs scripts/test-guidance-execution.cjs scripts/test-camera-tuning.cjs
 node --test scripts/test-camera-parameters.cjs
+node --test scripts/test-photo-library.cjs
 npx tsc --noEmit
 node scripts/export-guidance-schema.cjs
 ```
 
 测试使用模拟模型响应，不访问真实API，不使用真实密钥。[JSON v3协议与执行流程](../docs/camera-guidance-protocol.md)。
+
+## 灵感与相册
+
+灵感内置 AI 生成的人像、风景、夜景图片各 3 张，支持分类筛选和大图预览；图片及生成提示词在 `assets/inspiration/`。相册仅展示当前拍摄和已保存的照片，无示例图或虚构评分/EXIF；未保存照片只保留在当前会话。原生端保存时复制到应用文档目录并写入系统相册，Web 端用 IndexedDB 在当前浏览器内保存相机的 data URL，并迁移旧的相册记录。点击保存后，等待照片与相册记录写入成功，再自动进入相机继续拍摄；失败时保留预览，可重试。真机需检查拍摄、保存、重启后查看、收藏和拒绝相册权限的流程。
 
 ## AI配置
 

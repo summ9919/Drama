@@ -29,19 +29,13 @@ export const editorialShots: EditorialShot[] = [
 ];
 
 export const inspirationImages: InspirationItem[] = [
-  { uri: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=85', title: '暖光街角', tag: '人像 · 逆光' },
-  { uri: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=700&q=85', title: '奶油人像', tag: '人像 · 柔焦' },
-  { uri: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=700&q=85', title: '城市黄昏', tag: '风景 · 金色' },
-  { uri: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=700&q=85', title: '海边日落', tag: '风景 · 低饱和' },
-  { uri: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=700&q=85', title: '森林呼吸', tag: '自然 · 清透' },
-  { uri: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=700&q=85', title: '蓝调夜色', tag: '夜景 · 氛围' },
-];
-
-export const sampleAlbum = [
-  inspirationImages[1],
-  inspirationImages[3],
-  inspirationImages[4],
-  inspirationImages[0],
-  inspirationImages[5],
-  inspirationImages[2],
+  { source: require('../../assets/inspiration/portrait-window.jpg'), category: '人像', title: '窗边柔光', tag: '人像 · 侧光' },
+  { source: require('../../assets/inspiration/landscape-mountains.jpg'), category: '风景', title: '晨雾山湖', tag: '风景 · 倒影' },
+  { source: require('../../assets/inspiration/night-city.jpg'), category: '夜景', title: '雨夜街灯', tag: '夜景 · 冷暖对比' },
+  { source: require('../../assets/inspiration/portrait-street.jpg'), category: '人像', title: '金色街角', tag: '人像 · 逆光' },
+  { source: require('../../assets/inspiration/landscape-coast.jpg'), category: '风景', title: '海岸曲线', tag: '风景 · 引导线' },
+  { source: require('../../assets/inspiration/night-stars.jpg'), category: '夜景', title: '星河入湖', tag: '夜景 · 星空' },
+  { source: require('../../assets/inspiration/portrait-coast.jpg'), category: '人像', title: '海风侧颜', tag: '人像 · 轮廓光' },
+  { source: require('../../assets/inspiration/landscape-forest.jpg'), category: '风景', title: '林间光束', tag: '风景 · 纵深' },
+  { source: require('../../assets/inspiration/night-bridge.jpg'), category: '夜景', title: '桥下流光', tag: '夜景 · 灯光倒影' },
 ];

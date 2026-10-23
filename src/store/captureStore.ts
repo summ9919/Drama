@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { capturePersistence } from '../lib/capturePersistence';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -7,7 +7,7 @@ type CaptureState = {
   savedUris: string[];
   favoriteUris: string[];
   setCapturedUri: (uri: string | null) => void;
-  addSavedUri: (uri: string) => void;
+  addSavedUri: (uri: string) => Promise<void>;
   clearCapturedUri: () => void;
   toggleFavorite: (uri: string) => void;
   isFavorite: (uri: string) => boolean;
@@ -20,7 +20,8 @@ export const useCaptureStore = create<CaptureState>()(
       savedUris: [],
       favoriteUris: [],
       setCapturedUri: (capturedUri) => set({ capturedUri }),
-      addSavedUri: (uri) => set((state) => ({ savedUris: [uri, ...state.savedUris.filter((item) => item !== uri)] })),
+      // The persist middleware returns the storage write promise from set().
+      addSavedUri: async (uri) => { await set((state) => ({ savedUris: [uri, ...state.savedUris.filter((item) => item !== uri)] })); },
       clearCapturedUri: () => set({ capturedUri: null }),
       toggleFavorite: (uri) => set((state) => {
         const list = state.favoriteUris || [];
@@ -33,7 +34,7 @@ export const useCaptureStore = create<CaptureState>()(
     }),
     {
       name: 'warm-lens-captures',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => capturePersistence),
       partialize: (state) => ({ savedUris: state.savedUris, favoriteUris: state.favoriteUris || [] }),
     },
   ),

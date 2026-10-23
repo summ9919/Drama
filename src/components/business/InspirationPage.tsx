@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,17 +9,23 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, shadows } from '../../constants/theme';
 import { inspirationImages } from '../../constants/data';
+import type { InspirationCategory, InspirationItem } from '../../types';
 import { PageHeader } from '../ui/PageHeader';
 
 type Props = { onStartCamera: () => void };
 
 export function InspirationPage({ onStartCamera }: Props) {
-  const [category, setCategory] = useState('全部');
+  const [category, setCategory] = useState<InspirationCategory | '全部'>('全部');
+  const [previewItem, setPreviewItem] = useState<InspirationItem | null>(null);
+  const closePreview = () => setPreviewItem(null);
+  const filteredImages = inspirationImages.filter(item => category === '全部' || item.category === category);
   const columns = [
-    inspirationImages.filter((_, index) => index % 2 === 0),
-    inspirationImages.filter((_, index) => index % 2 === 1),
+    filteredImages.filter((_, index) => index % 2 === 0),
+    filteredImages.filter((_, index) => index % 2 === 1),
   ];
 
   return (
@@ -31,7 +38,7 @@ export function InspirationPage({ onStartCamera }: Props) {
         <Text style={styles.lead}>别急着按下快门，先看看光想把你带到哪里。</Text>
 
         <View style={styles.segmentRow}>
-          {['全部', '人像', '风景', '夜景'].map((item) => {
+          {(['全部', '人像', '风景', '夜景'] as const).map((item) => {
             const active = category === item;
             return (
               <Pressable
@@ -53,22 +60,23 @@ export function InspirationPage({ onStartCamera }: Props) {
           })}
         </View>
 
+        <Text style={styles.collectionNote}>{category} · {filteredImages.length} 张灵感 · AI 生成</Text>
         <View style={styles.grid}>
           {columns.map((column, columnIndex) => (
             <View key={columnIndex} style={styles.column}>
-              {column.map((item, index) => (
+              {column.map((item) => (
                 <Pressable
                   key={item.title}
                   style={({ pressed }) => [
                     styles.cardWrapper,
-                    columnIndex === 1 && index === 0 && styles.cardTallWrapper,
-                    columnIndex === 0 && index === 2 && styles.cardTallWrapper,
                     { transform: [{ scale: pressed ? 0.98 : 1 }] },
                   ]}
-                  onPress={onStartCamera}
+                  accessibilityRole="button"
+                  accessibilityLabel={`预览${item.title}`}
+                  onPress={() => setPreviewItem(item)}
                 >
                   <View style={styles.card}>
-                    <Image source={{ uri: item.uri }} style={styles.image} />
+                    <Image source={item.source} resizeMode="contain" style={styles.image} />
                     <LinearGradient
                       colors={['transparent', 'rgba(24, 22, 18, 0.52)']}
                       style={styles.overlay}
@@ -90,11 +98,97 @@ export function InspirationPage({ onStartCamera }: Props) {
           ))}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={previewItem !== null}
+        animationType="fade"
+        transparent
+        statusBarTranslucent
+        onRequestClose={closePreview}
+      >
+        {previewItem && (
+          <SafeAreaView style={styles.preview} edges={['top', 'bottom']} accessibilityViewIsModal>
+            <View style={styles.previewHeader}>
+              <View style={styles.previewCaption}>
+                <Text style={styles.previewTitle} numberOfLines={1}>{previewItem.title}</Text>
+                <Text style={styles.previewTag}>{previewItem.tag} · AI 生成</Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="关闭预览"
+                onPress={closePreview}
+                style={styles.previewClose}
+              >
+                <Ionicons name="close" size={24} color={colors.whiteWarm} />
+              </Pressable>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="关闭图片预览"
+              onPress={closePreview}
+              style={styles.previewImageWrap}
+            >
+              <Image
+                source={previewItem.source}
+                accessibilityLabel={previewItem.title}
+                resizeMode="contain"
+                style={styles.previewImage}
+              />
+            </Pressable>
+            <Text style={styles.previewHint}>轻点图片返回灵感</Text>
+          </SafeAreaView>
+        )}
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  preview: {
+    flex: 1,
+    backgroundColor: '#181612',
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    gap: 16,
+  },
+  previewCaption: {
+    flex: 1,
+  },
+  previewTitle: {
+    color: colors.whiteWarm,
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  previewTag: {
+    color: 'rgba(251, 249, 246, 0.65)',
+    fontSize: 12,
+    marginTop: 5,
+  },
+  previewClose: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  previewImageWrap: {
+    flex: 1,
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+  },
+  previewHint: {
+    color: 'rgba(251, 249, 246, 0.65)',
+    fontSize: 12,
+    textAlign: 'center',
+    padding: 20,
+  },
   screen: {
     flex: 1,
     position: 'relative',
@@ -110,6 +204,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(45, 42, 38, 0.04)',
   },
   container: {
+    width: '100%',
+    maxWidth: 640,
+    alignSelf: 'center',
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 110,
@@ -154,18 +251,21 @@ const styles = StyleSheet.create({
     gap: 12,
     alignItems: 'flex-start',
   },
+  collectionNote: {
+    color: colors.onSurfaceVariant,
+    fontSize: 11,
+    marginBottom: 12,
+  },
   column: {
     flex: 1,
     gap: 12,
   },
   cardWrapper: {
     width: '100%',
-    height: 215,
+    // All bundled inspiration photos are 1024 × 1536. Follow their full frame.
+    aspectRatio: 2 / 3,
     borderRadius: 24,
     ...shadows.glassMd,
-  },
-  cardTallWrapper: {
-    height: 255,
   },
   card: {
     width: '100%',
@@ -176,9 +276,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   image: {
-    ...StyleSheet.absoluteFillObject,
-    width: undefined,
-    height: undefined,
+    width: '100%',
+    height: '100%',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
