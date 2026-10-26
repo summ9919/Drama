@@ -238,8 +238,7 @@ npx eas-cli@latest build --platform android --profile production
 ├── src/hooks/                  # 相机流程、AI 请求和本地引导状态
 ├── src/lib/                    # API 客户端、JSON 校验、参数执行与安全存储
 ├── modules/camera-tuning/      # Android 相机参数原生模块
-├── docs/                       # 协议、摄影依据和界面截图
-└── scripts/                    # 回归测试与 Schema 导出
+└── docs/                       # 协议、摄影依据和界面截图
 ```
 
 | 想改什么 | 从哪里开始 |
@@ -252,14 +251,13 @@ npx eas-cli@latest build --platform android --profile production
 
 ### 测试
 
-类型检查和回归测试：
+运行类型检查：
 
 ```bash
 npx tsc --noEmit
-node --test scripts/test-ai-config.cjs scripts/test-camera-guidance.cjs scripts/test-camera-switch.cjs scripts/test-composition-target.cjs scripts/test-guidance-protocol.cjs scripts/test-guidance-execution.cjs scripts/test-camera-tuning.cjs
 ```
 
-测试使用模拟响应，不需要真实密钥。原生参数、镜头切换和实际模型表现仍需真机验证，详见[测试与验收清单](scripts/README.md)。
+原生参数、镜头切换和实际模型表现仍需真机验证，详见[测试与验收清单](docs/testing.md)。
 
 ### 常见问题
 

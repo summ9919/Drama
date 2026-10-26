@@ -1,5 +1,3 @@
-export type TabKey = 'camera' | 'inspiration' | 'album' | 'profile';
-
 export type InspirationCategory = '人像' | '风景' | '夜景';
 
 export type InspirationItem = {

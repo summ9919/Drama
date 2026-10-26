@@ -10,7 +10,6 @@ export default function RootLayout() {
   // navigation/action icon available offline instead of relying on a remote font.
   const [fontsLoaded] = useFonts({
     ionicons: require('../../assets/fonts/Ionicons.ttf'),
-    'material-community': require('../../assets/fonts/MaterialCommunityIcons.ttf'),
   });
 
   if (!fontsLoaded) {

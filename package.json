@@ -4,7 +4,6 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "brand:generate": "node scripts/generate-brand-assets.cjs",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -40,7 +39,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@resvg/resvg-js": "^2.6.2",
     "@types/react": "~18.3.12",
     "eas-cli": "^25.2.0",
     "typescript": "~5.3.3"

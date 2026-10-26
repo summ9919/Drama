@@ -238,8 +238,7 @@ npx eas-cli@latest build --platform android --profile production
 ├── src/hooks/                  # Camera flow, AI requests, and local guidance state
 ├── src/lib/                    # API client, JSON validation, param execution, secure storage
 ├── modules/camera-tuning/      # Android native camera parameter tuning module
-├── docs/                       # Protocols, photography design rationale, screenshots
-└── scripts/                    # Regression tests and schema export
+└── docs/                       # Protocols, photography design rationale, screenshots
 ```
 
 | Area | Entry Point |
@@ -252,14 +251,13 @@ npx eas-cli@latest build --platform android --profile production
 
 ### Testing
 
-Run type checks and regression tests:
+Run the TypeScript check:
 
 ```bash
 npx tsc --noEmit
-node --test scripts/test-ai-config.cjs scripts/test-camera-guidance.cjs scripts/test-camera-switch.cjs scripts/test-composition-target.cjs scripts/test-guidance-protocol.cjs scripts/test-guidance-execution.cjs scripts/test-camera-tuning.cjs
 ```
 
-Tests run with mocked responses and require no live API keys. Real hardware parameters, lens switches, and real model performance require physical device verification; see [Test & Verification Checklist](scripts/README.md).
+Real hardware parameters, lens switches, and real model performance require physical device verification; see [Test & Verification Checklist](docs/testing.md).
 
 ### FAQ
 

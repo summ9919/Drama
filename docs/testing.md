@@ -3,14 +3,10 @@
 在frontend目录执行：
 
 ```powershell
-node --test scripts/test-ai-config.cjs scripts/test-camera-guidance.cjs scripts/test-camera-switch.cjs scripts/test-composition-target.cjs scripts/test-guidance-protocol.cjs scripts/test-guidance-execution.cjs scripts/test-camera-tuning.cjs
-node --test scripts/test-camera-parameters.cjs
-node --test scripts/test-photo-library.cjs
 npx tsc --noEmit
-node scripts/export-guidance-schema.cjs
 ```
 
-测试使用模拟模型响应，不访问真实API，不使用真实密钥。[JSON v3协议与执行流程](../docs/camera-guidance-protocol.md)。
+[JSON v3协议与执行流程](camera-guidance-protocol.md)。
 
 ## 灵感与相册
 
