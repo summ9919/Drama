@@ -67,7 +67,7 @@ jobs:
       - name: Detect Xcode scheme
         id: scheme
         run: |
-          WS=$(ls ios/*.xcworkspace | head -1)
+          WS=$(ls -d ios/*.xcworkspace | head -1)
           BASE=$(basename "$WS" .xcworkspace)
           LIST=$(xcodebuild -list -json -workspace "$WS")
           SCHEME=$(printf '%s' "$LIST" | python3 -c "
