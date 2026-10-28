@@ -103,8 +103,8 @@ jobs:
       - name: Publish to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('ios-build-{0}', github.run_number) }}
-          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('iOS build #{0}', github.run_number) }}
+          tag_name: "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('ios-build-{0}', github.run_number) }}"
+          name: "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('iOS build run {0}', github.run_number) }}"
           body: |
             未签名 IPA（TrollStore 安装）：下载 `Drama.ipa` → 手机浏览器/文件 App 打开 → 用 TrollStore 导入安装。
 
