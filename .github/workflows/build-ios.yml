@@ -55,14 +55,28 @@ jobs:
           CI: "1"
         run: npx expo prebuild --platform ios --no-install --clean
 
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       - name: Install CocoaPods dependencies
         run: pod install --project-directory=ios
 
       - name: Detect Xcode scheme
         id: scheme
         run: |
-          LIST=$(xcodebuild -list -json -workspace ios/*.xcworkspace)
-          SCHEME=$(printf '%s' "$LIST" | python3 -c "import sys,json;ss=[s for s in json.load(sys.stdin)['workspace']['schemes'] if not s.startswith('Pods')];print(ss[0])")
+          WS=$(ls ios/*.xcworkspace | head -1)
+          BASE=$(basename "$WS" .xcworkspace)
+          LIST=$(xcodebuild -list -json -workspace "$WS")
+          SCHEME=$(printf '%s' "$LIST" | python3 -c "
+            import sys, json
+            base = sys.argv[1]
+            ss = json.load(sys.stdin)['workspace']['schemes']
+            cand = ([s for s in ss if s == base]
+                    or [s for s in ss if not s.startswith('Pods')])
+            print(cand[0])" "$BASE")
           echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
           echo "Detected scheme: $SCHEME"
 
@@ -133,6 +147,6 @@ jobs:
           git config user.name "ci-log-bot"
           git config user.email "actions@github.com"
           git checkout -B ci-logs
-          git add latest.log
+          git add -f latest.log
           git commit -m "ci log: run ${{ github.run_number }}" || true
           git push --force origin ci-logs
